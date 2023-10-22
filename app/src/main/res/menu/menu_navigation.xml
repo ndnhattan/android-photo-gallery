@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:id="@+id/menu_photo" android:title="Photo"
+        android:icon="@drawable/icon_photo3"></item>
+    <item android:id="@+id/menu_album" android:title="Album"
+        android:icon="@drawable/icon_album3"></item>
+    <item android:id="@+id/menu_favorite" android:title="Favorite"
+        android:icon="@drawable/icon_favorite"></item>
+    <item android:id="@+id/menu_private" android:title="Private"
+        android:icon="@drawable/icon_private"></item>
+</menu>
