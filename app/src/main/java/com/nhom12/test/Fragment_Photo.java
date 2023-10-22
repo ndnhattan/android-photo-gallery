@@ -1,61 +1,40 @@
 package com.nhom12.test;
 
+
+import android.database.Cursor;
 import android.os.Bundle;
-
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar;
-import androidx.fragment.app.Fragment;
-
+import android.provider.MediaStore;
+import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.GridView;
 import android.widget.LinearLayout;
+import android.widget.TextView;
 import android.widget.Toast;
+import androidx.appcompat.widget.Toolbar;
+import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
-/**
- * A simple {@link Fragment} subclass.
- * Use the {@link Fragment_Photo#newInstance} factory method to
- * create an instance of this fragment.
- */
+import com.nhom12.test.adapter.ListImageAdapter;
+
+import java.sql.Date;
+import java.sql.Timestamp;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.List;
+
 public class Fragment_Photo extends Fragment {
+    MainActivity main;
+    RecyclerView recyclerView;
+    ArrayList<Cursor> rs = new ArrayList<>();
 
-    // TODO: Rename parameter arguments, choose names that match
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-    private static final String ARG_PARAM1 = "param1";
-    private static final String ARG_PARAM2 = "param2";
-
-    // TODO: Rename and change types of parameters
-    private String mParam1;
-    private String mParam2;
-
-    public Fragment_Photo() {
-        // Required empty public constructor
-    }
-
-    /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     *
-     * @param param1 Parameter 1.
-     * @param param2 Parameter 2.
-     * @return A new instance of fragment Fragment_Photo.
-     */
-    // TODO: Rename and change types and number of parameters
-
-    ///////////////////////////////////////////////////////////////
-            ////// QUOC CODE CHO NAY ///////////
-
-    //MainActivity main;
-
-    public static Fragment_Photo newInstance(String param1, String param2) {
+    public static Fragment_Photo newInstance(String strArg) {
         Fragment_Photo fragment = new Fragment_Photo();
         Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
+        args.putString("strArg1", strArg);
         fragment.setArguments(args);
         return fragment;
     }
@@ -64,8 +43,89 @@ public class Fragment_Photo extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
+        try {
+            main = (MainActivity) getActivity();
+        } catch (IllegalStateException e) {
+            throw new IllegalStateException("MainActivity must implement callbacks");
+        }
+    }
 
-        //main = (MainActivity) getActivity();
+    private void listImages() {
+        String[] projection = {MediaStore.Images.Media._ID, MediaStore.Images.Media.DATA, // Path to the image file
+                MediaStore.Images.Media.DISPLAY_NAME, // Name of the image file
+                MediaStore.Images.Media.DATE_ADDED // Date when the image was added
+        };
+        String sortOrder = MediaStore.Images.Media.DATE_ADDED + " DESC"; // Sort by date added in descending order
+
+        Cursor result = main.getContentResolver().query(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, projection, null, null, sortOrder);
+        int position = 0;
+        int preyear = 0, premonth = 0, preday = 0;
+        while (result.moveToNext()) {
+            int dateColumnIndex = result.getColumnIndex(MediaStore.Images.Media.DATE_ADDED);
+            String imageDate = result.getString(dateColumnIndex);
+            Timestamp tms = new Timestamp(Long.parseLong(imageDate) * 1000);
+            Date date = new Date(tms.getTime());
+            int year = date.getYear() + 1900;
+            int month = date.getMonth() + 1;
+            int day = date.getDate();
+            if (preyear != 0 &&
+                    (preyear < year ||
+                    (preyear == year && premonth < month) ||
+                    (preyear == year && premonth == month && preday <= day))
+            ) {
+                continue;
+            }
+            preyear = year;
+            premonth = month;
+            preday = day;
+
+            String selection = MediaStore.Images.Media.DATE_ADDED + " >= ? AND " + MediaStore.Images.Media.DATE_ADDED + " < ?";
+
+            // Calculate the timestamp for the start of the selected month
+            long startOfMonth = getStartOfMonthTimestamp(year, month, day);
+
+            // Calculate the timestamp for the end of the selected month
+            long endOfMonth = startOfMonth + 24 * 60 * 60;
+
+            // Define the selection arguments
+            String[] selectionArgs = {String.valueOf(startOfMonth), String.valueOf(endOfMonth)};
+            Cursor monthImage = main.getContentResolver().query(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, projection, selection, selectionArgs, sortOrder);
+
+            Log.d("ImageLoader", "Year: " + String.valueOf(year));
+            Log.d("ImageLoader", "Month: " + String.valueOf(month));
+            Log.d("ImageLoader", "Day: " + String.valueOf(day));
+            Log.d("ImageLoader", "Length: " + String.valueOf(monthImage.getCount()));
+
+
+            rs.add(monthImage);
+            position += monthImage.getCount() - 1;
+            result.moveToPosition(position);
+        }
+    }
+
+    private static long getStartOfMonthTimestamp(int year, int month,int day) {
+        Calendar calendar = Calendar.getInstance();
+        calendar.set(Calendar.YEAR, year);
+        calendar.set(Calendar.MONTH, month - 1); // Month is 0-based
+        calendar.set(Calendar.DAY_OF_MONTH, day);
+        calendar.set(Calendar.HOUR_OF_DAY, 0);
+        calendar.set(Calendar.MINUTE, 0);
+        calendar.set(Calendar.SECOND, 0);
+        calendar.set(Calendar.MILLISECOND, 0);
+        return calendar.getTimeInMillis() / 1000; // Convert to seconds
+    }
+
+    // Helper method to calculate the timestamp for the end of the selected month
+    private static long getEndOfMonthTimestamp(int year, int month) {
+        Calendar calendar = Calendar.getInstance();
+        calendar.set(Calendar.YEAR, year);
+        calendar.set(Calendar.MONTH, month); // Month is 0-based
+        calendar.set(Calendar.DAY_OF_MONTH, 1);
+        calendar.set(Calendar.HOUR_OF_DAY, 0);
+        calendar.set(Calendar.MINUTE, 0);
+        calendar.set(Calendar.SECOND, 0);
+        calendar.set(Calendar.MILLISECOND, 0);
+        return calendar.getTimeInMillis() / 1000; // Convert to seconds
     }
 
     Toolbar mToolbar;
@@ -73,7 +133,16 @@ public class Fragment_Photo extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
+
         View rootView = inflater.inflate(R.layout.fragment__photo, container, false);
+
+        recyclerView = (RecyclerView) rootView.findViewById(R.id.recyclerView);
+        listImages();
+        recyclerView.setAdapter(new ListImageAdapter(main, rs));
+        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(main);
+
+        recyclerView.setLayoutManager(linearLayoutManager);
+
 
         mToolbar = (Toolbar) rootView.findViewById(R.id.toolbar_photo);
 
