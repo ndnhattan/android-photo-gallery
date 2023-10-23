@@ -59,7 +59,7 @@ public class ListImageAdapter extends RecyclerView.Adapter<ListImageAdapter.View
         holder.recyclerView.setAdapter(new GridImageAdapter(context, result));
         holder.recyclerView.setLayoutManager(new StaggeredGridLayoutManager(4, StaggeredGridLayoutManager.VERTICAL));
 
-//        holder.recyclerView.addItemDecoration(new SpacesItemDecoration(8));
+        holder.recyclerView.addItemDecoration(new SpaceItemDecoration(12));
 
     }
 

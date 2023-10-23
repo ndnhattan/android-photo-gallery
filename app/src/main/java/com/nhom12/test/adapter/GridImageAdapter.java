@@ -12,6 +12,7 @@ import android.widget.ImageView;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
+import com.bumptech.glide.load.resource.bitmap.RoundedCorners;
 import com.bumptech.glide.request.RequestOptions;
 import com.nhom12.test.R;
 
@@ -54,11 +55,12 @@ public class GridImageAdapter extends RecyclerView.Adapter<GridImageAdapter.View
 // Load the image with Glide
         Glide.with(context)
                 .load(path)
+                 // Adjust the radius as needed for desired corner roundness
                 .apply(options) // Apply the RequestOptions
                 .into(holder.imageView); // Display the image in the ImageView
 //        Bitmap bitmap = resizeImage(path, 150, 150);
 //        holder.imageView.setImageBitmap(bitmap);
-        holder.imageView.setLayoutParams(new AbsListView.LayoutParams(250, 254));
+        holder.imageView.setLayoutParams(new AbsListView.LayoutParams(250, 250));
     }
 
 
