@@ -27,6 +27,7 @@ import java.util.Calendar;
 import java.util.List;
 
 public class Fragment_Photo extends Fragment {
+    Toolbar mToolbar;
     MainActivity main;
     RecyclerView recyclerView;
     ArrayList<Cursor> rs = new ArrayList<>();
@@ -51,7 +52,8 @@ public class Fragment_Photo extends Fragment {
     }
 
     private void listImages() {
-        String[] projection = {MediaStore.Images.Media._ID, MediaStore.Images.Media.DATA, // Path to the image file
+        String[] projection = {MediaStore.Images.Media._ID,
+                MediaStore.Images.Media.DATA, // Path to the image file
                 MediaStore.Images.Media.DISPLAY_NAME, // Name of the image file
                 MediaStore.Images.Media.DATE_ADDED // Date when the image was added
         };
@@ -70,8 +72,8 @@ public class Fragment_Photo extends Fragment {
             int day = date.getDate();
             if (preyear != 0 &&
                     (preyear < year ||
-                    (preyear == year && premonth < month) ||
-                    (preyear == year && premonth == month && preday <= day))
+                            (preyear == year && premonth < month) ||
+                            (preyear == year && premonth == month && preday <= day))
             ) {
                 continue;
             }
@@ -91,12 +93,6 @@ public class Fragment_Photo extends Fragment {
             String[] selectionArgs = {String.valueOf(startOfMonth), String.valueOf(endOfMonth)};
             Cursor monthImage = main.getContentResolver().query(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, projection, selection, selectionArgs, sortOrder);
 
-            Log.d("ImageLoader", "Year: " + String.valueOf(year));
-            Log.d("ImageLoader", "Month: " + String.valueOf(month));
-            Log.d("ImageLoader", "Day: " + String.valueOf(day));
-            Log.d("ImageLoader", "Length: " + String.valueOf(monthImage.getCount()));
-
-
             rs.add(monthImage);
             position += monthImage.getCount() - 1;
             result.moveToPosition(position);
@@ -115,39 +111,18 @@ public class Fragment_Photo extends Fragment {
         return calendar.getTimeInMillis() / 1000; // Convert to seconds
     }
 
-    // Helper method to calculate the timestamp for the end of the selected month
-    private static long getEndOfMonthTimestamp(int year, int month) {
-        Calendar calendar = Calendar.getInstance();
-        calendar.set(Calendar.YEAR, year);
-        calendar.set(Calendar.MONTH, month); // Month is 0-based
-        calendar.set(Calendar.DAY_OF_MONTH, 1);
-        calendar.set(Calendar.HOUR_OF_DAY, 0);
-        calendar.set(Calendar.MINUTE, 0);
-        calendar.set(Calendar.SECOND, 0);
-        calendar.set(Calendar.MILLISECOND, 0);
-        return calendar.getTimeInMillis() / 1000; // Convert to seconds
-    }
-
-    Toolbar mToolbar;
-
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-
-
         View rootView = inflater.inflate(R.layout.fragment__photo, container, false);
 
         recyclerView = (RecyclerView) rootView.findViewById(R.id.recyclerView);
         listImages();
         recyclerView.setAdapter(new ListImageAdapter(main, rs));
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(main);
-
         recyclerView.setLayoutManager(linearLayoutManager);
 
-
         mToolbar = (Toolbar) rootView.findViewById(R.id.toolbar_photo);
-
         mToolbar.setOnMenuItemClickListener(item -> {
-
             int id = item.getItemId();
 
             if (id == R.id.camera) {
@@ -166,8 +141,6 @@ public class Fragment_Photo extends Fragment {
                 return false;
 
         });
-
-
 
         return rootView;
     }

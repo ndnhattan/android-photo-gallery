@@ -1,25 +1,30 @@
 package com.nhom12.test.adapter;
 
+import android.app.usage.ExternalStorageStats;
 import android.content.Context;
+import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.provider.MediaStore;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AbsListView;
 import android.widget.ImageView;
+import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners;
 import com.bumptech.glide.request.RequestOptions;
 import com.nhom12.test.R;
+import com.nhom12.test.activities.DetailPhotoActivity;
 
 import androidx.recyclerview.widget.RecyclerView;
 
 public class GridImageAdapter extends RecyclerView.Adapter<GridImageAdapter.ViewHolder> {
-    private Cursor rs; // Replace with your data structure
+    private Cursor rs;
     private Context context;
 
     public GridImageAdapter(Context context, Cursor rs) {
@@ -29,38 +34,44 @@ public class GridImageAdapter extends RecyclerView.Adapter<GridImageAdapter.View
 
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-
-
         Context context = parent.getContext();
         LayoutInflater inflater = LayoutInflater.from(context);
 
-        // Nạp layout cho View biểu diễn phần tử sinh viên
-        View studentView = inflater.inflate(R.layout.item_grid_image, parent, false);
+        View view = inflater.inflate(R.layout.item_grid_image, parent, false);
 
-        ViewHolder viewHolder = new ViewHolder(studentView);
+        ViewHolder viewHolder = new ViewHolder(view);
         return viewHolder;
     }
 
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
         rs.moveToPosition(position);
-
         String path = rs.getString(1);
+
         // Create RequestOptions to specify image loading options
         RequestOptions options = new RequestOptions()
-//                .placeholder(R.drawable.placeholder) // Placeholder image while loading
-//                .error(R.drawable.error) // Error image if loading fails
+                //.placeholder(R.drawable.placeholder) // Placeholder image while loading
+                //.error(R.drawable.error) // Error image if loading fails
                 .diskCacheStrategy(DiskCacheStrategy.ALL); // Caching strategy
 
-// Load the image with Glide
+        // Load the image with Glide
         Glide.with(context)
                 .load(path)
-                 // Adjust the radius as needed for desired corner roundness
                 .apply(options) // Apply the RequestOptions
                 .into(holder.imageView); // Display the image in the ImageView
-//        Bitmap bitmap = resizeImage(path, 150, 150);
-//        holder.imageView.setImageBitmap(bitmap);
+
         holder.imageView.setLayoutParams(new AbsListView.LayoutParams(250, 250));
+        holder.imageView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent myIntent = new Intent(context, DetailPhotoActivity.class);
+                myIntent.putExtra("path", path);
+                int dateColumnIndex = rs.getColumnIndex(MediaStore.Images.Media.DATE_ADDED);
+                String imageDate = rs.getString(dateColumnIndex);
+                myIntent.putExtra("date", imageDate);
+                context.startActivity(myIntent);
+            }
+        });
     }
 
 
@@ -77,39 +88,5 @@ public class GridImageAdapter extends RecyclerView.Adapter<GridImageAdapter.View
             imageView = itemView.findViewById(R.id.imageView);
         }
 
-    }
-
-    public static Bitmap resizeImage(String imagePath, int targetWidth, int targetHeight) {
-        BitmapFactory.Options options = new BitmapFactory.Options();
-        options.inJustDecodeBounds = true; // Set this to true to calculate the dimensions only
-
-        // Decode the image file to get its dimensions
-        BitmapFactory.decodeFile(imagePath, options);
-
-        // Calculate the inSampleSize (scaling factor)
-        options.inSampleSize = calculateInSampleSize(options, targetWidth, targetHeight);
-
-        // Decode the image with the calculated inSampleSize
-        options.inJustDecodeBounds = false;
-        return BitmapFactory.decodeFile(imagePath, options);
-    }
-
-    public static int calculateInSampleSize(BitmapFactory.Options options, int reqWidth, int reqHeight) {
-        final int width = options.outWidth;
-        final int height = options.outHeight;
-        int inSampleSize = 1;
-
-        if (height > reqHeight || width > reqWidth) {
-            final int halfHeight = height / 2;
-            final int halfWidth = width / 2;
-
-            // Calculate the largest inSampleSize value that is a power of 2 and keeps both
-            // height and width larger than or equal to the requested height and width.
-            while ((halfHeight / inSampleSize) >= reqHeight && (halfWidth / inSampleSize) >= reqWidth) {
-                inSampleSize *= 2;
-            }
-        }
-
-        return inSampleSize;
     }
 }

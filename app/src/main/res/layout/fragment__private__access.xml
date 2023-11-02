@@ -5,11 +5,11 @@
     android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".Fragment_Favorite">
+    tools:context=".Fragment_Private_Access">
 
     <androidx.appcompat.widget.Toolbar
-        android:id="@+id/toolbar_favorite"
-        app:title="Favorite"
+        android:id="@+id/toolbar_private_access"
+        app:title="Private"
         app:titleMarginStart="25dp"
 
         app:titleTextColor="#FFFFFF"
@@ -18,7 +18,7 @@
 
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
-        app:menu="@menu/menu_toolbar_favorite"
+        app:menu="@menu/menu_toolbar_private"
         >
 
     </androidx.appcompat.widget.Toolbar>
@@ -27,10 +27,10 @@
     <Button
         android:id="@+id/button"
         android:layout_marginTop="40dp"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@drawable/custom_button"
-        android:text="Love"
+        android:text="Private"
         android:textSize="18sp"
         android:layout_gravity="center"
         android:textColor="#ffffffff">

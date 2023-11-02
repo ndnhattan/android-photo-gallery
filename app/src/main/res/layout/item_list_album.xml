@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:orientation="vertical">
+
+    <ImageView
+        android:id="@+id/buttonAll"
+        android:layout_width="80dp"
+        android:layout_height="80dp"
+        android:layout_gravity="left"
+        android:layout_marginTop="20dp"
+        android:layout_marginRight="16dp"
+        android:layout_marginLeft="16dp"
+        android:src="@drawable/icon_all_album"
+        android:scaleType="centerInside">
+
+    </ImageView>
+
+    <TextView
+        android:id="@+id/textAlbum"
+        android:layout_width="match_parent"
+        android:gravity="center"
+        android:layout_height="wrap_content"
+        android:text="Picture Camera"
+        android:textSize="16sp"
+        android:textStyle="bold"
+        android:layout_marginTop="6dp"
+        />
+
+
+
+</LinearLayout>

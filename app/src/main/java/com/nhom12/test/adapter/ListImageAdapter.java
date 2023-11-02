@@ -19,7 +19,7 @@ import java.sql.Timestamp;
 import java.util.ArrayList;
 
 public class ListImageAdapter extends RecyclerView.Adapter<ListImageAdapter.ViewHolder> {
-    private ArrayList<Cursor> rs; // Replace with your data structure
+    private ArrayList<Cursor> rs;
     private Context context;
 
     public ListImageAdapter(Context context, ArrayList<Cursor> rs) {
@@ -32,17 +32,14 @@ public class ListImageAdapter extends RecyclerView.Adapter<ListImageAdapter.View
         Context context = parent.getContext();
         LayoutInflater inflater = LayoutInflater.from(context);
 
-        // Nạp layout cho View biểu diễn phần tử sinh viên
-        View studentView = inflater.inflate(R.layout.item_list_image, parent, false);
+        View view = inflater.inflate(R.layout.item_list_image, parent, false);
 
-        ViewHolder viewHolder = new ViewHolder(studentView);
+        ViewHolder viewHolder = new ViewHolder(view);
         return viewHolder;
     }
 
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
-        Log.d("ImageLoader", "Position: " + String.valueOf(this.getItemCount()));
-
         Cursor result = rs.get(position);
 
         result.moveToFirst();
@@ -55,12 +52,9 @@ public class ListImageAdapter extends RecyclerView.Adapter<ListImageAdapter.View
         int day = date.getDate();
 
         holder.textView.setText(String.valueOf(day) +" tháng " + String.valueOf(month + 1) + ", năm " + String.valueOf(year + 1900));
-
         holder.recyclerView.setAdapter(new GridImageAdapter(context, result));
         holder.recyclerView.setLayoutManager(new StaggeredGridLayoutManager(4, StaggeredGridLayoutManager.VERTICAL));
-
         holder.recyclerView.addItemDecoration(new SpaceItemDecoration(12));
-
     }
 
     @Override
