@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:id="@+id/menu_edit_crop" android:title="Crop"
+        android:icon="@drawable/icon_crop"></item>
+    <item android:id="@+id/menu_edit_filter" android:title="Filter"
+        android:icon="@drawable/icon_filter"></item>
+    <item android:id="@+id/menu_edit_icon" android:title="Icon"
+        android:icon="@drawable/icon_emotion"></item>
+    <item android:id="@+id/menu_edit_frame" android:title="Frame"
+        android:icon="@drawable/icon_frame"></item>
+</menu>
