@@ -80,6 +80,7 @@ public class DetailPhotoActivity extends AppCompatActivity {
                 }
             }
         });
+
         navigation.setOnNavigationItemSelectedListener(item -> {
             int key = item.getItemId();
             if(key == R.id.menu_photo){
