@@ -123,7 +123,6 @@ public class DetailPhotoActivity extends AppCompatActivity {
         getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
         int screenWidth = displayMetrics.widthPixels;
         int screenHeight = displayMetrics.heightPixels;
-        Log.d("TAG", "resizeImage: " + screenHeight + screenWidth);
 
         if (screenHeight <= originalBitmap.getHeight()) {
             int newHeight = screenHeight;
