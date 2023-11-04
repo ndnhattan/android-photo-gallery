@@ -1,20 +1,27 @@
 package com.nhom12.test.activities;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+import androidx.fragment.app.Fragment;
 
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.net.Uri;
 import android.os.Bundle;
 import android.util.DisplayMetrics;
 import android.view.View;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.nhom12.test.Fragment_Album;
+import com.nhom12.test.Fragment_Favorite;
+import com.nhom12.test.Fragment_Photo;
+import com.nhom12.test.Fragment_Private;
 import com.nhom12.test.R;
-
 import java.sql.Date;
 import java.text.SimpleDateFormat;
 import java.time.Instant;
@@ -28,6 +35,7 @@ public class EditActivity extends AppCompatActivity {
     TextView txtDate, txtTime;
     boolean flag = true;
     BottomNavigationView navigation;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -51,6 +59,13 @@ public class EditActivity extends AppCompatActivity {
         editImage.setImageBitmap(bitmap);
 
         navigation = (BottomNavigationView) findViewById(R.id.bottom_navigation);
+        navigation.setOnNavigationItemSelectedListener(item -> {
+            int key = item.getItemId();
+            if(key == R.id.menu_edit_crop){
+
+            }
+            return true;
+        });
         editImage.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -92,4 +107,5 @@ public class EditActivity extends AppCompatActivity {
             return resizedBitmap;
         }
     }
+
 }
