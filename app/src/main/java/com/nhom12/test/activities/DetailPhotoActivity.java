@@ -93,6 +93,23 @@ public class DetailPhotoActivity extends AppCompatActivity {
                 }
             }
         });
+
+        navigation.setOnNavigationItemSelectedListener(item -> {
+            int key = item.getItemId();
+            if(key == R.id.menu_photo){
+
+                ///////////
+            }else if(key == R.id.menu_album){
+                Intent myIntent = new Intent(this, EditActivity.class);
+                myIntent.putExtra("path", value);
+                this.startActivity(myIntent);
+            }else if(key == R.id.menu_favorite){
+
+                /////////
+            }
+            return true;
+        });
+
     }
 
     public Bitmap resizeImage(String imagePath) {
