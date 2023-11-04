@@ -1,57 +1,5 @@
 package com.nhom12.test;
 
-//import androidx.appcompat.app.AppCompatActivity;
-//import androidx.fragment.app.Fragment;
-//import androidx.fragment.app.FragmentManager;
-//import androidx.fragment.app.FragmentTransaction;
-//
-//import android.os.Bundle;
-//
-//import com.nhom12.test.databinding.ActivityMainBinding;
-//
-//
-//public class MainActivity extends AppCompatActivity {
-//
-//    ActivityMainBinding binding;
-//
-//    @Override
-//    protected void onCreate(Bundle savedInstanceState) {
-//        super.onCreate(savedInstanceState);
-//        binding = ActivityMainBinding.inflate(getLayoutInflater());
-//        setContentView(binding.getRoot());
-//
-//        replaceFragment(new Fragment_Photo());
-//        binding.bottomNavigation.setBackground(null);
-//
-//        binding.bottomNavigation.setOnItemSelectedListener(item -> {
-//            switch (item.getItemId()){
-//                    case 1000002:
-//                        replaceFragment(new Fragment_Photo()) ;
-//                        break;
-//                    case 1000005:
-//                        replaceFragment(new Fragment_Album()) ;
-//                        break;
-//                    case 1000000:
-//                        replaceFragment(new Fragment_Love()) ;
-//                        break;
-//                    case 1000004:
-//                        replaceFragment(new Fragment_Private()) ;
-//                        break;
-//                }
-//                return true;
-//        });
-//    }
-//
-//    private void replaceFragment(Fragment fragment){
-//        FragmentManager fragmentManager = getSupportFragmentManager();
-//        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-//        fragmentTransaction.replace(R.id.frame_layout, fragment);
-//        fragmentTransaction.commit();
-//    }
-//
-//}
-
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.Fragment;
@@ -78,6 +26,9 @@ public class MainActivity extends AppCompatActivity implements MainCallBacks {
         // Check permission
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED){
             ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE},121);
+        }
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED){
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},122);
         }
 
         //this line hide statusbar
@@ -111,6 +62,8 @@ public class MainActivity extends AppCompatActivity implements MainCallBacks {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
 
         if (requestCode == 121 && grantResults[0]==PackageManager.PERMISSION_GRANTED) {
+        }
+        if (requestCode == 122 && grantResults[1]==PackageManager.PERMISSION_GRANTED) {
         }
     }
 
