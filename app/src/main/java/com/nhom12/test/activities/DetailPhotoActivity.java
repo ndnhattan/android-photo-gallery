@@ -4,15 +4,22 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.util.DisplayMetrics;
+import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+import androidx.fragment.app.Fragment;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.nhom12.test.Fragment_Album;
+import com.nhom12.test.Fragment_Favorite;
+import com.nhom12.test.Fragment_Photo;
+import com.nhom12.test.Fragment_Private;
 import com.nhom12.test.R;
 
 import java.sql.Date;
@@ -49,7 +56,7 @@ public class DetailPhotoActivity extends AppCompatActivity {
         mToolbar = (Toolbar) findViewById(R.id.toolbar_detail_photo);
         txtDate = (TextView) findViewById(R.id.date);
         txtTime = (TextView) findViewById(R.id.time);
-        txtDate.setText(String.valueOf(day) +" tháng " + String.valueOf(month) + ", năm " + String.valueOf(year));
+        txtDate.setText(String.valueOf(day) + " tháng " + String.valueOf(month) + ", năm " + String.valueOf(year));
         txtTime.setText(formattedTime);
 
         mToolbar.setNavigationIcon(getResources().getDrawable(R.drawable.ic_arrow_back));
@@ -61,19 +68,25 @@ public class DetailPhotoActivity extends AppCompatActivity {
         });
 
         detailImage = (ImageView) findViewById(R.id.detailImageView);
-        Bitmap bitmap = resizeImage(value, 0, 0);
+        Bitmap bitmap = resizeImage(value);
         detailImage.setImageBitmap(bitmap);
 
         navigation = (BottomNavigationView) findViewById(R.id.bottom_navigation);
+        navigation.setOnNavigationItemSelectedListener(item -> {
+            int key = item.getItemId();
+            if(key == R.id.menu_photo){
+
+            }
+            return true;
+        });
         detailImage.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (flag){
+                if (flag) {
                     mToolbar.setVisibility(View.INVISIBLE);
                     navigation.setVisibility(View.INVISIBLE);
                     flag = false;
-                }
-                else{
+                } else {
                     mToolbar.setVisibility(View.VISIBLE);
                     navigation.setVisibility(View.VISIBLE);
                     flag = true;
@@ -99,7 +112,7 @@ public class DetailPhotoActivity extends AppCompatActivity {
 
     }
 
-    public Bitmap resizeImage(String imagePath, int targetWidth, int targetHeight) {
+    public Bitmap resizeImage(String imagePath) {
 //        BitmapFactory.Options options = new BitmapFactory.Options();
 //        options.inJustDecodeBounds = true; // Set this to true to calculate the dimensions only
 
@@ -109,37 +122,19 @@ public class DetailPhotoActivity extends AppCompatActivity {
         DisplayMetrics displayMetrics = new DisplayMetrics();
         getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
         int screenWidth = displayMetrics.widthPixels;
+        int screenHeight = displayMetrics.heightPixels;
+        Log.d("TAG", "resizeImage: " + screenHeight + screenWidth);
 
-        int newWidth = screenWidth;
-        int newHeight = (int) (originalBitmap.getHeight() * ((float) newWidth / originalBitmap.getWidth()));
-        Bitmap resizedBitmap = Bitmap.createScaledBitmap(originalBitmap, newWidth, newHeight, true);
-
-//        // Calculate the inSampleSize (scaling factor)
-//        options.inSampleSize = calculateInSampleSize(options, targetWidth, targetHeight);
-//
-//        // Decode the image with the calculated inSampleSize
-//        options.inJustDecodeBounds = false;
-//        return BitmapFactory.decodeFile(imagePath, options);
-
-        return  resizedBitmap;
-    }
-
-    public static int calculateInSampleSize(BitmapFactory.Options options, int reqWidth, int reqHeight) {
-        final int width = options.outWidth;
-        final int height = options.outHeight;
-        int inSampleSize = 1;
-
-        if (height > reqHeight || width > reqWidth) {
-            final int halfHeight = height / 2;
-            final int halfWidth = width / 2;
-
-            // Calculate the largest inSampleSize value that is a power of 2 and keeps both
-            // height and width larger than or equal to the requested height and width.
-            while ((halfHeight / inSampleSize) >= reqHeight && (halfWidth / inSampleSize) >= reqWidth) {
-                inSampleSize *= 2;
-            }
+        if (screenHeight <= originalBitmap.getHeight()) {
+            int newHeight = screenHeight;
+            int newWidth = (int) (originalBitmap.getWidth() * ((float) newHeight / originalBitmap.getHeight()));
+            Bitmap resizedBitmap = Bitmap.createScaledBitmap(originalBitmap, newWidth, newHeight, true);
+            return resizedBitmap;
+        } else {
+            int newWidth = screenWidth;
+            int newHeight = (int) (originalBitmap.getHeight() * ((float) newWidth / originalBitmap.getWidth()));
+            Bitmap resizedBitmap = Bitmap.createScaledBitmap(originalBitmap, newWidth, newHeight, true);
+            return resizedBitmap;
         }
-
-        return inSampleSize;
     }
 }

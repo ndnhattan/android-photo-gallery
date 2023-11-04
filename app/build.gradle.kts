@@ -42,4 +42,5 @@ dependencies {
 
     implementation("com.github.bumptech.glide:glide:4.12.0") // Use the latest version
     annotationProcessor("com.github.bumptech.glide:compiler:4.12.0") // Use the same version as above
+    implementation("com.vanniktech:android-image-cropper:4.5.0")
 }
