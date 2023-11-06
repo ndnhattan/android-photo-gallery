@@ -96,27 +96,19 @@ public class DetailPhotoActivity extends AppCompatActivity {
 
         navigation.setOnNavigationItemSelectedListener(item -> {
             int key = item.getItemId();
-            if(key == R.id.menu_photo){
 
-                ///////////
-            }else if(key == R.id.menu_album){
+            if(key == R.id.menu_detail_edit){
                 Intent myIntent = new Intent(this, EditActivity.class);
                 myIntent.putExtra("path", value);
                 this.startActivity(myIntent);
-            }else if(key == R.id.menu_favorite){
-
-                /////////
             }
+
             return true;
         });
 
     }
 
     public Bitmap resizeImage(String imagePath) {
-//        BitmapFactory.Options options = new BitmapFactory.Options();
-//        options.inJustDecodeBounds = true; // Set this to true to calculate the dimensions only
-
-        // Decode the image file to get its dimensions
         Bitmap originalBitmap = BitmapFactory.decodeFile(imagePath);
 
         DisplayMetrics displayMetrics = new DisplayMetrics();

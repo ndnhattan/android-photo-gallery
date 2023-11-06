@@ -64,7 +64,7 @@
         app:itemTextColor="@color/color_navigation"
         app:labelVisibilityMode="selected"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:menu="@menu/menu_navigation">
+        app:menu="@menu/menu_detail_navigation">
 
     </com.google.android.material.bottomnavigation.BottomNavigationView>
 

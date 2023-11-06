@@ -13,6 +13,7 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.ImageDecoder;
+import android.media.MediaScannerConnection;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -32,6 +33,7 @@ import com.nhom12.test.Fragment_Album;
 import com.nhom12.test.Fragment_Favorite;
 import com.nhom12.test.Fragment_Photo;
 import com.nhom12.test.Fragment_Private;
+import com.nhom12.test.MainActivity;
 import com.nhom12.test.R;
 import com.squareup.picasso.Picasso;
 import com.theartofdev.edmodo.cropper.CropImage;
@@ -39,6 +41,8 @@ import com.theartofdev.edmodo.cropper.CropImage;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.sql.Timestamp;
+import java.util.ArrayList;
 import java.util.Random;
 
 public class EditActivity extends AppCompatActivity {
@@ -49,7 +53,9 @@ public class EditActivity extends AppCompatActivity {
     TextView txtDate, txtTime;
     boolean flag = true;
     BottomNavigationView navigation;
-    Uri imageUri;
+    ArrayList<Uri> imageUri = new ArrayList<>();
+    int index = 0;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -57,7 +63,7 @@ public class EditActivity extends AppCompatActivity {
 
         Intent intent = getIntent();
         String value = intent.getStringExtra("path");
-        imageUri = Uri.fromFile(new File(value));
+        imageUri.add(Uri.fromFile(new File(value)));
 
         mToolbar = (Toolbar) findViewById(R.id.toolbar_edit);
 
@@ -74,16 +80,31 @@ public class EditActivity extends AppCompatActivity {
             if (id == R.id.save) {
                 ContentResolver contentResolver = getContentResolver();
                 try {
-                    ImageDecoder.Source source = ImageDecoder.createSource(contentResolver, imageUri);
+                    ImageDecoder.Source source = ImageDecoder.createSource(contentResolver, imageUri.get(index));
                     Bitmap bitmap = ImageDecoder.decodeBitmap(source);
-                    createDirectoryAndSaveFile(bitmap, "gallery" + ".jpeg");
+                    String imagePath = createDirectoryAndSaveFile(bitmap, "gallery-" + new Timestamp(System.currentTimeMillis()) + ".jpeg");
+                    MediaScannerConnection.scanFile(this, new String[]{imagePath}, null, null);
+                    Intent i = new Intent(this, MainActivity.class);
+                    i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                    startActivity(i);
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
                 return true;
-            } else
-                return false;
-
+            } else if (id == R.id.undo) {
+                if (index > 0) {
+                    index--;
+                    Glide.with(this).load(imageUri.get(index)).centerCrop().into(editImage);
+                }
+                return true;
+            } else if (id == R.id.redo) {
+                if (index < imageUri.size()-1) {
+                    index++;
+                    Glide.with(this).load(imageUri.get(index)).centerCrop().into(editImage);
+                }
+                return true;
+            }
+            return false;
         });
 
         editImage = (ImageView) findViewById(R.id.edit_ImageView);
@@ -94,7 +115,7 @@ public class EditActivity extends AppCompatActivity {
         navigation.setOnNavigationItemSelectedListener(item -> {
             int key = item.getItemId();
             if (key == R.id.menu_edit_crop) {
-                CropImage.activity(imageUri).start(this);
+                CropImage.activity(imageUri.get(index)).start(this);
             }
             return true;
         });
@@ -146,13 +167,16 @@ public class EditActivity extends AppCompatActivity {
             if (data != null) {
                 CropImage.ActivityResult result = CropImage.getActivityResult(data);
                 Uri resultUri = result.getUri();
-                Glide.with(this).load(resultUri).into(editImage);
-                imageUri = resultUri;
+                Glide.with(this).load(resultUri).centerCrop().into(editImage);
+                index++;
+                imageUri.add(index, resultUri);
+                imageUri = new ArrayList<>(imageUri.subList(0, index+1));
+
             }
         }
     }
 
-    private void createDirectoryAndSaveFile(Bitmap imageToSave, String fileName) {
+    private String createDirectoryAndSaveFile(Bitmap imageToSave, String fileName) {
 
         File direct = new File(Environment.getExternalStorageDirectory() + "/Pictures");
 
@@ -173,5 +197,7 @@ public class EditActivity extends AppCompatActivity {
         } catch (Exception e) {
             e.printStackTrace();
         }
+
+        return file.getAbsolutePath();
     }
 }
