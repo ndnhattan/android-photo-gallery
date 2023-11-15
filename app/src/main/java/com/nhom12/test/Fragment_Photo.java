@@ -35,6 +35,9 @@ public class Fragment_Photo extends Fragment {
     MainActivity main;
     RecyclerView recyclerView;
     ArrayList<Cursor> rs = new ArrayList<>();
+    public static Cursor result;
+    public static ArrayList<Integer> indexArr = new ArrayList<>();
+    public static int index;
 
     public static Fragment_Photo newInstance(String strArg) {
         Fragment_Photo fragment = new Fragment_Photo();
@@ -63,7 +66,7 @@ public class Fragment_Photo extends Fragment {
         };
         String sortOrder = MediaStore.Images.Media.DATE_ADDED + " DESC"; // Sort by date added in descending order
 
-        Cursor result = main.getContentResolver().query(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, projection, null, null, sortOrder);
+        result = main.getContentResolver().query(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, projection, null, null, sortOrder);
         int position = 0;
         int preyear = 0, premonth = 0, preday = 0;
         while (result.moveToNext()) {
@@ -98,6 +101,7 @@ public class Fragment_Photo extends Fragment {
             Cursor monthImage = main.getContentResolver().query(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, projection, selection, selectionArgs, sortOrder);
 
             rs.add(monthImage);
+            indexArr.add(position);
             position += monthImage.getCount() - 1;
             result.moveToPosition(position);
         }
