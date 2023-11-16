@@ -1,5 +1,9 @@
 package com.nhom12.test.activities;
 
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
+import androidx.fragment.app.Fragment;
+
 import android.app.Dialog;
 import android.content.ContentUris;
 import android.content.Context;
@@ -10,34 +14,23 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.util.DisplayMetrics;
-import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.Button;
-import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar;
-import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentTransaction;
-
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
+import com.bumptech.glide.request.RequestOptions;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.nhom12.test.Fragment_Album;
-import com.nhom12.test.Fragment_Album_Photo;
-import com.nhom12.test.Fragment_Favorite;
-import com.nhom12.test.Fragment_Photo;
-import com.nhom12.test.Fragment_Private;
-import com.nhom12.test.OnItemClickListener;
+import com.nhom12.test.MainActivity;
 import com.nhom12.test.R;
-import com.nhom12.test.adapter.GridAlbumAdapter;
 import com.nhom12.test.database.AlbumDbHelper;
 import com.nhom12.test.database.DatabaseSingleton;
-import com.nhom12.test.structures.Album;
 
 import java.io.File;
 import java.sql.Date;
@@ -46,7 +39,7 @@ import java.time.Instant;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 
-public class DetailPhotoActivity extends AppCompatActivity {
+public class DetailRemovePhotoActivity extends AppCompatActivity {
     ImageView detailImage;
     Toolbar mToolbar;
     TextView txtDate, txtTime;
@@ -58,7 +51,7 @@ public class DetailPhotoActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_detail_photo);
+        setContentView(R.layout.activity_detail_remove_photo);
 
         //set db
         albumDbHelper = DatabaseSingleton.getInstance(this).getDbHelper();
@@ -121,17 +114,64 @@ public class DetailPhotoActivity extends AppCompatActivity {
         navigation.setOnNavigationItemSelectedListener(item -> {
             int key = item.getItemId();
 
-            if(key == R.id.menu_detail_edit){
-                Intent myIntent = new Intent(this, EditActivity.class);
-                myIntent.putExtra("path", value);
-                this.startActivity(myIntent);
-            } else if(key == R.id.menu_detail_delete){
+            if(key == R.id.menu_detail_delete){
                 displayDialogAndRemove(imageId);
             }
 
             return true;
         });
 
+    }
+
+    public void onBackPressed() {
+        finish(); // Kết thúc activity hiện tại
+        // Mở lại activity trước đó
+        Intent intent = new Intent(DetailRemovePhotoActivity.this, MainActivity.class);
+        startActivity(intent);
+    }
+
+    // Delete image from mediastore
+    public void deleteImageFromMediaStore(Context context, long imageId){
+        Uri itemUri = ContentUris.withAppendedId(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, imageId);
+        int result = context.getContentResolver().delete(itemUri, null, null);
+    }
+
+    // Dialog for remove
+    public void displayDialogAndRemove(long imageId){
+        final Dialog dialog = new Dialog(DetailRemovePhotoActivity.this);
+        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+        dialog.setContentView(R.layout.layout_check);
+        Window window = dialog.getWindow();
+        if(window == null){
+            return;
+        }
+        window.setLayout(WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.WRAP_CONTENT);
+
+        WindowManager.LayoutParams windowAttributes= window.getAttributes();
+        windowAttributes.gravity = Gravity.CENTER;
+        window.setAttributes(windowAttributes);
+
+        dialog.setCancelable(true);
+        Button btnSubmit = dialog.findViewById(R.id.btnSubmit_check);
+        Button btnExit = dialog.findViewById(R.id.btnExit_check);
+
+        btnSubmit.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                deleteImageFromMediaStore(DetailRemovePhotoActivity.this,imageId);
+                albumDbHelper.deleteImageById(imageId);
+                dialog.dismiss();
+                onBackPressed();
+            }
+        });
+
+        btnExit.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                dialog.dismiss();
+            }
+        });
+        dialog.show();
     }
 
     public Bitmap resizeImage(String imagePath) {
@@ -155,41 +195,5 @@ public class DetailPhotoActivity extends AppCompatActivity {
         }
     }
 
-    // Dialog for remove
-    public void displayDialogAndRemove(long imageId){
-        final Dialog dialog = new Dialog(DetailPhotoActivity.this);
-        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
-        dialog.setContentView(R.layout.layout_check);
-        Window window = dialog.getWindow();
-        if(window == null){
-            return;
-        }
-        window.setLayout(WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.WRAP_CONTENT);
 
-        WindowManager.LayoutParams windowAttributes= window.getAttributes();
-        windowAttributes.gravity = Gravity.CENTER;
-        window.setAttributes(windowAttributes);
-
-        dialog.setCancelable(true);
-        Button btnSubmit = dialog.findViewById(R.id.btnSubmit_check);
-        Button btnExit = dialog.findViewById(R.id.btnExit_check);
-
-        btnSubmit.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                albumDbHelper.moveImageToAlbum(imageId, "Remove");
-                dialog.dismiss();
-                finish();
-
-            }
-        });
-
-        btnExit.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                dialog.dismiss();
-            }
-        });
-        dialog.show();
-    }
 }
