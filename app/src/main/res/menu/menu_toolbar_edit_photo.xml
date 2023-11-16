@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <item android:title="Undo"
+        android:id="@+id/undo"
+        android:icon="@drawable/ic_undo"
+        app:showAsAction="always"></item>
+    <item android:title="Redo"
+        android:id="@+id/redo"
+        android:icon="@drawable/ic_redo"
+        app:showAsAction="always"></item>
+    <item android:title="Save"
+        android:id="@+id/save"
+        app:showAsAction="always"></item>
+</menu>

@@ -3,11 +3,11 @@ plugins {
 }
 
 android {
-    namespace = "com.example.myapplication"
-    compileSdk = 33
+    namespace = "com.nhom12.test"
+    compileSdk = 34
 
     defaultConfig {
-        applicationId = "com.example.myapplication"
+        applicationId = "com.nhom12.test"
         minSdk = 28
         targetSdk = 33
         versionCode = 1
@@ -19,15 +19,15 @@ android {
     buildTypes {
         release {
             isMinifyEnabled = false
-            proguardFiles(
-                getDefaultProguardFile("proguard-android-optimize.txt"),
-                "proguard-rules.pro"
-            )
+            proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
         }
     }
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_1_8
         targetCompatibility = JavaVersion.VERSION_1_8
+    }
+    buildFeatures{
+        viewBinding = true
     }
 }
 
@@ -39,4 +39,10 @@ dependencies {
     testImplementation("junit:junit:4.13.2")
     androidTestImplementation("androidx.test.ext:junit:1.1.5")
     androidTestImplementation("androidx.test.espresso:espresso-core:3.5.1")
+
+    implementation("com.github.bumptech.glide:glide:4.12.0") // Use the latest version
+    annotationProcessor("com.github.bumptech.glide:compiler:4.12.0") // Use the same version as above
+
+    implementation("com.theartofdev.edmodo:android-image-cropper:2.8.0")
+    implementation("com.squareup.picasso:picasso:2.5.2")
 }

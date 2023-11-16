@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".Fragment_Album"
+    >
+
+    <androidx.appcompat.widget.Toolbar
+        android:id="@+id/toolbar_album"
+        app:title="Album"
+        app:titleMarginStart="25dp"
+
+        app:titleTextColor="#FFFFFF"
+        android:background="@color/light_blue"
+
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        app:menu="@menu/menu_toolbar_album"
+        >
+
+    </androidx.appcompat.widget.Toolbar>
+
+    <!-- TODO: Update blank fragment layout -->
+
+    <GridView
+        android:id="@+id/layout_grid_album"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:verticalSpacing="5dip"
+        android:horizontalSpacing="5dip"
+        android:numColumns="auto_fit"
+        android:columnWidth="100dip"
+
+        />
+
+</LinearLayout>

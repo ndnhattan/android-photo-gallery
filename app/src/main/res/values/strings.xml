@@ -1,3 +1,16 @@
 <resources>
-    <string name="app_name">My Application</string>
+    <string name="app_name">Gallery</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="enter_your_password">Enter your password</string>
+    <string name="enter">Enter</string>
+    <string name="new_password">Enter</string>
+    <string name="create_password">Create password</string>
+    <string name="confirm_password">Confirm password</string>
+    <string name="question_for_getting_back_password">Question for getting back password</string>
+    <string name="write_your_question">Write your question</string>
+    <string name="your_answer_for_the_question_above">Your answer for the question above</string>
+    <string name="create">Create</string>
+    <string name="question">Question: What is your favorite number?</string>
+    <string name="unknown">Unknown</string>
 </resources>
