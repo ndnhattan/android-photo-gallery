@@ -68,6 +68,8 @@ public class GridAlbumAdapter extends RecyclerView.Adapter<GridAlbumAdapter.View
                 holder.imageView.setImageResource(R.drawable.icon_garbage_album);
             } else if (albumName.equals("Private")){
                 holder.imageView.setImageResource(R.drawable.icon_private_album);
+            } else {
+                holder.imageView.setImageResource(R.drawable.icon_create_default_album);
             }
         }
         holder.imageView.setOnClickListener(new View.OnClickListener() {

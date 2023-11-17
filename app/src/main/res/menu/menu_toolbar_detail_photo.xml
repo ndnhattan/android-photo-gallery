@@ -6,4 +6,7 @@
         android:id="@+id/camera"
         android:icon="@drawable/icon_favorite"
         app:showAsAction="always"></item>
+
+    <item android:title="Move to Album"
+        android:id="@+id/move_to_album"></item>
 </menu>

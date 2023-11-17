@@ -181,4 +181,17 @@ public class AlbumDbHelper extends SQLiteOpenHelper {
 
         db.delete(TABLE_IMAGES, selection, selectionArgs);
     }
+
+    public Cursor getImageById(long imageId) {
+        SQLiteDatabase db = this.getReadableDatabase();
+
+        String query = "SELECT * FROM " + TABLE_IMAGES + " WHERE " + IMAGE_ID + " = ?";
+        String[] selectionArgs = new String[]{String.valueOf(imageId)};
+
+        if (db != null) {
+            return db.rawQuery(query, selectionArgs);
+        }
+
+        return null;
+    }
 }
