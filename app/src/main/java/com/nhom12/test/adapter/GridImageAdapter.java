@@ -1,5 +1,6 @@
 package com.nhom12.test.adapter;
 
+import android.annotation.SuppressLint;
 import android.app.usage.ExternalStorageStats;
 import android.content.ContentValues;
 import android.content.Context;
@@ -21,6 +22,7 @@ import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners;
 import com.bumptech.glide.request.RequestOptions;
+import com.nhom12.test.Fragment_Photo;
 import com.nhom12.test.R;
 import com.nhom12.test.activities.DetailPhotoActivity;
 
@@ -29,10 +31,12 @@ import androidx.recyclerview.widget.RecyclerView;
 public class GridImageAdapter extends RecyclerView.Adapter<GridImageAdapter.ViewHolder> {
     private Cursor rs;
     private Context context;
+    private int index;
 
-    public GridImageAdapter(Context context, Cursor rs) {
+    public GridImageAdapter(Context context, Cursor rs, int index) {
         this.context = context;
         this.rs = rs;
+        this.index = index;
     }
 
     @Override
@@ -47,7 +51,7 @@ public class GridImageAdapter extends RecyclerView.Adapter<GridImageAdapter.View
     }
 
     @Override
-    public void onBindViewHolder(ViewHolder holder, int position) {
+    public void onBindViewHolder(ViewHolder holder, @SuppressLint("RecyclerView") int position) {
         rs.moveToPosition(position);
         int pathColumnIndex = rs.getColumnIndex(MediaStore.Images.Media.DATA);
         String path = rs.getString(pathColumnIndex);
@@ -71,6 +75,8 @@ public class GridImageAdapter extends RecyclerView.Adapter<GridImageAdapter.View
         holder.imageView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                Fragment_Photo.index = Fragment_Photo.indexArr.get(index) + position;
+
                 Intent myIntent = new Intent(context, DetailPhotoActivity.class);
                 myIntent.putExtra("path", path);
                 int dateColumnIndex = rs.getColumnIndex(MediaStore.Images.Media.DATE_ADDED);

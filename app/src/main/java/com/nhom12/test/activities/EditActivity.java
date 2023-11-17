@@ -94,13 +94,13 @@ public class EditActivity extends AppCompatActivity {
             } else if (id == R.id.undo) {
                 if (index > 0) {
                     index--;
-                    Glide.with(this).load(imageUri.get(index)).centerCrop().into(editImage);
+                    Glide.with(this).load(imageUri.get(index)).into(editImage);
                 }
                 return true;
             } else if (id == R.id.redo) {
                 if (index < imageUri.size()-1) {
                     index++;
-                    Glide.with(this).load(imageUri.get(index)).centerCrop().into(editImage);
+                    Glide.with(this).load(imageUri.get(index)).into(editImage);
                 }
                 return true;
             }
@@ -167,7 +167,7 @@ public class EditActivity extends AppCompatActivity {
             if (data != null) {
                 CropImage.ActivityResult result = CropImage.getActivityResult(data);
                 Uri resultUri = result.getUri();
-                Glide.with(this).load(resultUri).centerCrop().into(editImage);
+                Glide.with(this).load(resultUri).into(editImage);
                 index++;
                 imageUri.add(index, resultUri);
                 imageUri = new ArrayList<>(imageUri.subList(0, index+1));
