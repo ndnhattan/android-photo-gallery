@@ -36,18 +36,15 @@ public class GridImageAdapter extends RecyclerView.Adapter<GridImageAdapter.View
     private Cursor rs;
     private Context context;
     private int index;
+    private ArrayList<String> album;
+    private static int REQUEST_CODE_PIC = 10;
 
     public GridImageAdapter(Context context, Cursor rs, int index) {
         this.context = context;
         this.rs = rs;
         this.index = index;
+    }
 
-public class GridImageAdapter extends RecyclerView.Adapter<GridImageAdapter.ViewHolder> {
-    private Cursor rs;
-    private Context context;
-
-    private ArrayList<String> album;
-    private static int REQUEST_CODE_PIC = 10;
 
     public GridImageAdapter(ArrayList<String> album) {
         this.album = album;

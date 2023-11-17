@@ -157,7 +157,6 @@ public class Fragment_Album extends Fragment {
         View rootView = inflater.inflate(R.layout.fragment__album, container, false);
 
         mToolbar = (Toolbar) rootView.findViewById(R.id.toolbar_album);
-        myGridView = ((GridView) rootView.findViewById(R.id.layout_grid_album));
 
         mToolbar.setOnMenuItemClickListener(item -> {
 

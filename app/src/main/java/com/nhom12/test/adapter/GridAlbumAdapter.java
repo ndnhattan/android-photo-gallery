@@ -1,5 +1,6 @@
 package com.nhom12.test.adapter;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
 import android.view.LayoutInflater;
@@ -20,7 +21,9 @@ import com.nhom12.test.R;
 import com.nhom12.test.structures.Album;
 
 import java.util.ArrayList;
+import com.nhom12.test.R;
 
+import java.util.ArrayList;
 public class GridAlbumAdapter extends RecyclerView.Adapter<GridAlbumAdapter.ViewHolder> {
     Context context;
     ArrayList<Album> albumList;
@@ -47,7 +50,7 @@ public class GridAlbumAdapter extends RecyclerView.Adapter<GridAlbumAdapter.View
     }
 
     @Override
-    public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
+    public void onBindViewHolder(@NonNull ViewHolder holder, @SuppressLint("RecyclerView") int position) {
         String albumName = albumList.get(position).getName();
         holder.textView.setText(albumName);
         String pathFirstImage = albumList.get(position).getFirstImagesData();
@@ -100,33 +103,4 @@ public class GridAlbumAdapter extends RecyclerView.Adapter<GridAlbumAdapter.View
         }
 
 
-
-import com.nhom12.test.R;
-
-import java.util.ArrayList;
-
-public class GridAlbumAdapter extends ArrayAdapter<String> {
-    Context context;
-    ArrayList<Integer> iconAlbum;
-    ArrayList<String> nameAlbum;
-
-
-    public GridAlbumAdapter(@NonNull Context context, int layoutToBeInflated, ArrayList<String> nameAlbum, ArrayList<Integer> iconAlbum) {
-        super(context, R.layout.item_list_album, nameAlbum);
-        this.context = context;
-        this.nameAlbum = nameAlbum;
-        this.iconAlbum = iconAlbum;
-    }
-
-    @Override
-    public View getView(int position, View convertView, ViewGroup parent) {
-        LayoutInflater inflater = ((Activity) context).getLayoutInflater();
-        View row = inflater.inflate(R.layout.item_list_album, null);
-        TextView textAlbum = (TextView) row.findViewById(R.id.textAlbum);
-        ImageView icon = (ImageView) row.findViewById(R.id.buttonAll);
-        icon.setImageResource(iconAlbum.get(position));
-        textAlbum.setText(nameAlbum.get(position));
-        return (row);
-    }
-
-}
+    }}

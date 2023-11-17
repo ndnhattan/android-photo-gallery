@@ -108,11 +108,7 @@ public class DetailPhotoActivity extends AppCompatActivity {
         String value = intent.getStringExtra("path");
         String imageDate = intent.getStringExtra("date");
         long imageId = intent.getLongExtra("id", 0); // dt
-        Intent intent = getIntent();
 
-        String value = intent.getStringExtra("path");
-
-        String imageDate = intent.getStringExtra("date");
 
         Instant instant = Instant.ofEpochMilli(Long.parseLong(imageDate) * 1000);
         ZonedDateTime zonedDateTime = instant.atZone(ZoneId.systemDefault());
@@ -153,9 +149,7 @@ public class DetailPhotoActivity extends AppCompatActivity {
             @Override
             public boolean onMenuItemClick(MenuItem item) {
                 int key = item.getItemId();
-                if (key == R.id.favorite) {
-                    Toast.makeText(DetailPhotoActivity.this, "click", Toast.LENGTH_SHORT).show();
-                } else if (key == R.id.move_to_album) {
+                if (key == R.id.move_to_album) {
                     Fragment fragment = Fragment_Album_Choose.newInstance(imageId);
                     getSupportFragmentManager().beginTransaction().replace(R.id.body_container_detail, fragment).commit();
                 }
