@@ -86,7 +86,6 @@ public class DetailPhotoActivity extends AppCompatActivity {
         String formattedTime = dateFormat.format(date);
 
         mToolbar = (Toolbar) findViewById(R.id.toolbar_detail_photo);
-
         mToolbar.setOnMenuItemClickListener(item -> {
             int id = item.getItemId();
 
@@ -117,6 +116,9 @@ public class DetailPhotoActivity extends AppCompatActivity {
                 int key = item.getItemId();
                 if (key == R.id.favorite) {
                     Toast.makeText(DetailPhotoActivity.this, "click", Toast.LENGTH_SHORT).show();
+                } else if (key == R.id.move_to_album) {
+                    Fragment fragment = Fragment_Album_Choose.newInstance(imageId);
+                    getSupportFragmentManager().beginTransaction().replace(R.id.body_container_detail, fragment).commit();
                 }
                 return true;
             }
