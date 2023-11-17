@@ -137,9 +137,8 @@ public class DetailPhotoActivity extends AppCompatActivity {
             }
             return true;
         });
-        detailImage.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
+        detailImage.setOnTouchListener(new OnSwipeTouchListener(this) {
+            public void onClick() {
                 if (flag) {
                     mToolbar.setVisibility(View.INVISIBLE);
                     navigation.setVisibility(View.INVISIBLE);
@@ -150,8 +149,7 @@ public class DetailPhotoActivity extends AppCompatActivity {
                     flag = true;
                 }
             }
-        });
-        detailImage.setOnTouchListener(new OnSwipeTouchListener(this) {
+
             public void onSwipeRight() {
                 if (Fragment_Photo.index > 0) {
                     Fragment_Photo.index = Fragment_Photo.index - 1;
