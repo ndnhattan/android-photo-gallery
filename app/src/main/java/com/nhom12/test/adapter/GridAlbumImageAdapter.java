@@ -1,15 +1,8 @@
 package com.nhom12.test.adapter;
 
-import android.annotation.SuppressLint;
-import android.app.usage.ExternalStorageStats;
-import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.media.MediaScannerConnection;
-import android.net.Uri;
 import android.provider.MediaStore;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -18,25 +11,22 @@ import android.widget.AbsListView;
 import android.widget.ImageView;
 import android.widget.Toast;
 
-import com.bumptech.glide.Glide;
-import com.bumptech.glide.load.engine.DiskCacheStrategy;
-import com.bumptech.glide.load.resource.bitmap.RoundedCorners;
-import com.bumptech.glide.request.RequestOptions;
-import com.nhom12.test.Fragment_Photo;
-import com.nhom12.test.R;
-import com.nhom12.test.activities.DetailPhotoActivity;
-
 import androidx.recyclerview.widget.RecyclerView;
 
-public class GridImageAdapter extends RecyclerView.Adapter<GridImageAdapter.ViewHolder> {
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
+import com.bumptech.glide.request.RequestOptions;
+import com.nhom12.test.R;
+import com.nhom12.test.activities.DetailPhotoActivity;
+import com.nhom12.test.activities.DetailRemovePhotoActivity;
+
+public class GridAlbumImageAdapter extends RecyclerView.Adapter<GridAlbumImageAdapter.ViewHolder>{
     private Cursor rs;
     private Context context;
-    private int index;
 
-    public GridImageAdapter(Context context, Cursor rs, int index) {
+    public GridAlbumImageAdapter(Context context, Cursor rs) {
         this.context = context;
         this.rs = rs;
-        this.index = index;
     }
 
     @Override
@@ -51,13 +41,11 @@ public class GridImageAdapter extends RecyclerView.Adapter<GridImageAdapter.View
     }
 
     @Override
-    public void onBindViewHolder(ViewHolder holder, @SuppressLint("RecyclerView") int position) {
+    public void onBindViewHolder(ViewHolder holder, int position) {
         rs.moveToPosition(position);
-        int pathColumnIndex = rs.getColumnIndex(MediaStore.Images.Media.DATA);
-        String path = rs.getString(pathColumnIndex);
-
-        int idColumnIndex = rs.getColumnIndex(MediaStore.Images.Media._ID);
-        long imageId = rs.getLong(idColumnIndex);
+        String path = rs.getString(1);
+        long imageId = rs.getLong(0);
+        String albumName = rs.getString(3);
 
         // Create RequestOptions to specify image loading options
         RequestOptions options = new RequestOptions()
@@ -75,17 +63,25 @@ public class GridImageAdapter extends RecyclerView.Adapter<GridImageAdapter.View
         holder.imageView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Fragment_Photo.index = Fragment_Photo.indexArr.get(index) + position;
-
-                Intent myIntent = new Intent(context, DetailPhotoActivity.class);
-                myIntent.putExtra("path", path);
-                int dateColumnIndex = rs.getColumnIndex(MediaStore.Images.Media.DATE_ADDED);
-                String imageDate = rs.getString(dateColumnIndex);
-                myIntent.putExtra("date", imageDate);
-                myIntent.putExtra("id", imageId); // dt
-                context.startActivity(myIntent);
+                if(albumName.equals("Remove")){
+                    Intent myIntentRemove = new Intent(context, DetailRemovePhotoActivity.class);
+                    myIntentRemove.putExtra("path", path);
+                    String imageDate = rs.getString(2);
+                    myIntentRemove.putExtra("date", imageDate);
+                    myIntentRemove.putExtra("id", imageId);
+                    context.startActivity(myIntentRemove);
+                } else {
+                    Intent myIntent = new Intent(context, DetailPhotoActivity.class);
+                    myIntent.putExtra("path", path);
+                    String imageDate = rs.getString(2);
+                    myIntent.putExtra("date", imageDate);
+                    myIntent.putExtra("id", imageId);
+                    context.startActivity(myIntent);
+                }
             }
         });
+
+        //DT
 
     }
 

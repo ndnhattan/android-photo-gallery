@@ -2,14 +2,13 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".Fragment_Album"
-    >
+    tools:context=".Fragment_Photo"
+    android:orientation="vertical">
 
     <androidx.appcompat.widget.Toolbar
-        android:id="@+id/toolbar_album"
+        android:id="@+id/toolbar_photo"
         app:title="Album"
         app:titleMarginStart="25dp"
 
@@ -18,30 +17,22 @@
 
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
-        app:menu="@menu/menu_toolbar_album"
+        app:menu="@menu/menu_toolbar_photo"
         >
 
     </androidx.appcompat.widget.Toolbar>
 
-    <!-- TODO: Update blank fragment layout -->
-
-<!--    <GridView-->
-<!--        android:id="@+id/layout_grid_album"-->
-<!--        android:layout_width="match_parent"-->
-<!--        android:layout_height="wrap_content"-->
-<!--        android:columnWidth="100dip"-->
-<!--        android:horizontalSpacing="5dip"-->
-<!--        android:numColumns="auto_fit"-->
-<!--        android:verticalSpacing="5dip"-->
-
-<!--        />-->
-
     <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/layout_grid_album"
+        android:id="@+id/recyclerView"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="@android:color/white"
+        android:layout_height="match_parent"
+
+        android:paddingTop="12dp"
+        android:paddingLeft="6dp"
+        android:paddingBottom="100dp"
+        android:paddingRight="6dp"
         android:clipToPadding="false"
+        android:background="@android:color/white"
         android:scrollbars="vertical" />
 
 </LinearLayout>

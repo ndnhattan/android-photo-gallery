@@ -1,14 +1,23 @@
 package com.nhom12.test.activities;
 
+import android.app.Dialog;
+import android.content.ContentUris;
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.util.DisplayMetrics;
 import android.util.Log;
-import android.view.MenuItem;
+import android.view.Gravity;
 import android.view.View;
+import android.view.Window;
+import android.view.WindowManager;
+import android.widget.Button;
+import android.widget.EditText;
+import android.view.MenuItem;
 import android.widget.AbsListView;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -17,18 +26,26 @@ import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentTransaction;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.bumptech.glide.request.RequestOptions;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.nhom12.test.Fragment_Album;
+import com.nhom12.test.Fragment_Album_Photo;
 import com.nhom12.test.Fragment_Favorite;
 import com.nhom12.test.Fragment_Photo;
 import com.nhom12.test.Fragment_Private;
+import com.nhom12.test.OnItemClickListener;
 import com.nhom12.test.R;
+import com.nhom12.test.adapter.GridAlbumAdapter;
+import com.nhom12.test.database.AlbumDbHelper;
+import com.nhom12.test.database.DatabaseSingleton;
+import com.nhom12.test.structures.Album;
 import com.nhom12.test.utils.OnSwipeTouchListener;
 
+import java.io.File;
 import java.sql.Date;
 import java.text.SimpleDateFormat;
 import java.time.Instant;
@@ -41,15 +58,21 @@ public class DetailPhotoActivity extends AppCompatActivity {
     TextView txtDate, txtTime;
     boolean flag = true;
     BottomNavigationView navigation;
+    AlbumDbHelper albumDbHelper;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_detail_photo);
 
+        //set db
+        albumDbHelper = DatabaseSingleton.getInstance(this).getDbHelper();
+
         Intent intent = getIntent();
         String value = intent.getStringExtra("path");
         String imageDate = intent.getStringExtra("date");
+        long imageId = intent.getLongExtra("id", 0); // dt
         Instant instant = Instant.ofEpochMilli(Long.parseLong(imageDate) * 1000);
         ZonedDateTime zonedDateTime = instant.atZone(ZoneId.systemDefault());
 
@@ -168,6 +191,8 @@ public class DetailPhotoActivity extends AppCompatActivity {
                 Intent myIntent = new Intent(this, EditActivity.class);
                 myIntent.putExtra("path", value);
                 this.startActivity(myIntent);
+            } else if(key == R.id.menu_detail_delete){
+                displayDialogAndRemove(imageId);
             }
 
             return true;
@@ -194,5 +219,43 @@ public class DetailPhotoActivity extends AppCompatActivity {
             Bitmap resizedBitmap = Bitmap.createScaledBitmap(originalBitmap, newWidth, newHeight, true);
             return resizedBitmap;
         }
+    }
+
+    // Dialog for remove
+    public void displayDialogAndRemove(long imageId){
+        final Dialog dialog = new Dialog(DetailPhotoActivity.this);
+        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+        dialog.setContentView(R.layout.layout_check);
+        Window window = dialog.getWindow();
+        if(window == null){
+            return;
+        }
+        window.setLayout(WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.WRAP_CONTENT);
+
+        WindowManager.LayoutParams windowAttributes= window.getAttributes();
+        windowAttributes.gravity = Gravity.CENTER;
+        window.setAttributes(windowAttributes);
+
+        dialog.setCancelable(true);
+        Button btnSubmit = dialog.findViewById(R.id.btnSubmit_check);
+        Button btnExit = dialog.findViewById(R.id.btnExit_check);
+
+        btnSubmit.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                albumDbHelper.moveImageToAlbum(imageId, "Remove");
+                dialog.dismiss();
+                finish();
+
+            }
+        });
+
+        btnExit.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                dialog.dismiss();
+            }
+        });
+        dialog.show();
     }
 }
