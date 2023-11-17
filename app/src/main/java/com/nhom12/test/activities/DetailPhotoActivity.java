@@ -20,6 +20,23 @@ import android.widget.EditText;
 import android.view.MenuItem;
 import android.widget.AbsListView;
 import android.widget.ImageView;
+import android.content.Intent;
+import android.content.SharedPreferences;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
+import android.media.ExifInterface;
+import android.net.Uri;
+import android.os.Bundle;
+import android.os.ParcelFileDescriptor;
+import android.provider.MediaStore;
+import android.util.DisplayMetrics;
+import android.view.LayoutInflater;
+import android.view.MenuItem;
+import android.view.View;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -48,11 +65,24 @@ import com.nhom12.test.structures.Album;
 import com.nhom12.test.utils.OnSwipeTouchListener;
 
 import java.io.File;
+
+import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.google.android.material.bottomsheet.BottomSheetDialog;
+import com.nhom12.test.DataLocalManager;
+import com.nhom12.test.R;
+
+import java.io.File;
+import java.io.FileDescriptor;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.sql.Date;
 import java.text.SimpleDateFormat;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 public class DetailPhotoActivity extends AppCompatActivity {
     ImageView detailImage;
@@ -62,6 +92,9 @@ public class DetailPhotoActivity extends AppCompatActivity {
     BottomNavigationView navigation;
     AlbumDbHelper albumDbHelper;
 
+    //new
+    private List<String> listFavorImgPath;
+    private int pos;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -75,6 +108,12 @@ public class DetailPhotoActivity extends AppCompatActivity {
         String value = intent.getStringExtra("path");
         String imageDate = intent.getStringExtra("date");
         long imageId = intent.getLongExtra("id", 0); // dt
+        Intent intent = getIntent();
+
+        String value = intent.getStringExtra("path");
+
+        String imageDate = intent.getStringExtra("date");
+
         Instant instant = Instant.ofEpochMilli(Long.parseLong(imageDate) * 1000);
         ZonedDateTime zonedDateTime = instant.atZone(ZoneId.systemDefault());
 
@@ -120,6 +159,28 @@ public class DetailPhotoActivity extends AppCompatActivity {
                     Fragment fragment = Fragment_Album_Choose.newInstance(imageId);
                     getSupportFragmentManager().beginTransaction().replace(R.id.body_container_detail, fragment).commit();
                 }
+                if (key == R.id.add_to_favor) {
+                    try {
+                        Set<String> imageListFavor = new HashSet<>();
+
+                        imageListFavor.add(value);
+
+                        DataLocalManager.setListImg(imageListFavor);
+                        Toast.makeText(getApplicationContext(), "Yêu thích ảnh thành công", Toast.LENGTH_LONG).show();
+                    } catch (Exception e) {
+                        e.printStackTrace();
+
+                        Toast.makeText(getApplicationContext(), "Error: " + e.getMessage(), Toast.LENGTH_LONG).show();
+                    }
+                }
+                else if(key == R.id.btn_info){
+                    File imageFile = new File(value);
+                    Uri targetUri = Uri.fromFile(imageFile);
+                    if (targetUri != null) {
+                        showInfo(targetUri, value);
+                    }
+                }
+
                 return true;
             }
         });
@@ -209,6 +270,17 @@ public class DetailPhotoActivity extends AppCompatActivity {
             } else if(key == R.id.menu_detail_delete){
                 displayDialogAndRemove(imageId);
             }
+            else if (key == R.id.menu_detail_share){
+                Drawable mDrawable = Drawable.createFromPath(value);
+                Bitmap mBitmap = ((BitmapDrawable) mDrawable).getBitmap();
+                String path = MediaStore.Images.Media.insertImage(getContentResolver(), mBitmap, "Image Description", null);
+
+                Uri uri = Uri.parse(path);
+                Intent shareIntent = new Intent(Intent.ACTION_SEND);
+                shareIntent.setType("image/*");
+                shareIntent.putExtra(Intent.EXTRA_STREAM, uri);
+                startActivity(Intent.createChooser(shareIntent, "Share Image"));
+            }
 
             return true;
         });
@@ -277,4 +349,75 @@ public class DetailPhotoActivity extends AppCompatActivity {
     public void onBackPressedExit() {
         finish(); // Kết thúc activity hiện tại
     }
+    private void showInfo(Uri imgUri, String value) {
+        if (imgUri != null) {
+
+            try {
+                ExifInterface exifInterface = new ExifInterface(value);
+                File file = new File(value);
+                String imgName = file.getName();
+
+                BottomSheetDialog infoBottomDialog = new BottomSheetDialog(this, R.style.BottomSheetDialogTheme);
+                View infoDialogView = LayoutInflater.from(getApplicationContext())
+                        .inflate(
+                                R.layout.layout_info,
+                                (LinearLayout) findViewById(R.id.infoContainer),
+                                false
+                        );
+                TextView txtInfoProducer = (TextView) infoDialogView.findViewById(R.id.txtInfoProducer);
+                TextView txtInfoReso = (TextView) infoDialogView.findViewById(R.id.txtInfoReso);
+                TextView txtInfoModel = (TextView) infoDialogView.findViewById(R.id.txtInfoModel);
+
+
+
+                TextView txtInfoTime = (TextView) infoDialogView.findViewById(R.id.txtInfoTime);
+                TextView txtInfoName = (TextView) infoDialogView.findViewById(R.id.txtInfoName);
+
+                txtInfoName.setText(imgName);
+                txtInfoProducer.setText(exifInterface.getAttribute(ExifInterface.TAG_MAKE));
+                //txtInfoSize.setText(exifInterface.getAttribute(ExifInterface.TAG_IMAGE_LENGTH) + "x" + exifInterface.getAttribute(ExifInterface.TAG_IMAGE_WIDTH));
+                String length = exifInterface.getAttribute(ExifInterface.TAG_IMAGE_LENGTH);
+                String width = exifInterface.getAttribute(ExifInterface.TAG_IMAGE_WIDTH);
+
+                int imageLength = Integer.parseInt(length);
+                int imageWidth = Integer.parseInt(width);
+
+                int resolution = imageLength * imageWidth;
+                double megapixels = (double) resolution / 1000000.0;
+
+                String megapixelsString = String.format("%.2f MP", megapixels);
+
+                txtInfoReso.setText(megapixelsString);
+
+                txtInfoModel.setText(exifInterface.getAttribute(ExifInterface.TAG_MODEL));
+
+                txtInfoTime.setText(exifInterface.getAttribute(ExifInterface.TAG_DATETIME));
+
+                infoBottomDialog.setContentView(infoDialogView);
+                infoBottomDialog.show();
+
+
+                //parcelFileDescriptor.close();
+
+
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+                Toast.makeText(getApplicationContext(),
+                        "Something wrong:\n" + e.toString(),
+                        Toast.LENGTH_LONG).show();
+            } catch (IOException e) {
+                e.printStackTrace();
+                Toast.makeText(getApplicationContext(),
+                        "Something wrong:\n" + e.toString(),
+                        Toast.LENGTH_LONG).show();
+            }
+
+
+        } else {
+            Toast.makeText(getApplicationContext(),
+                    "image Uri == null",
+                    Toast.LENGTH_LONG).show();
+        }
+    }
+
 }

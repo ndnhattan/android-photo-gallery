@@ -1,9 +1,16 @@
 package com.nhom12.test;
 
 import android.content.Context;
+import android.widget.Toast;
+
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 public class DataLocalManager {
-    private static final String PREF_FIRST_INSTALL = "PREF_FIRST_INSTALL";
+    private static final String PREF_IMG_FAVOR="PREF_IMG_FAVOR";
+private static final String PREF_FIRST_INSTALL = "PREF_FIRST_INSTALL";
     private static final String PREF_STRING = "PREF_STRING";
     private static DataLocalManager instance;
     private MySharedPreferences mySharedPreferences;
@@ -19,4 +26,45 @@ public class DataLocalManager {
         }
         return instance;
     }
+    public static void setListImg(Set<String> listImg){
+        //DataLocalManager.getInstance().mySharedPreferences.deleteListFavor(PREF_IMG_FAVOR);
+
+        DataLocalManager.getInstance().mySharedPreferences.putStringSet(PREF_IMG_FAVOR, listImg);
+
+    }
+
+    public static Set<String> getListImg(){
+        return DataLocalManager.getInstance().mySharedPreferences.getStringSet(PREF_IMG_FAVOR);
+    }
+
+    public static void setListImgByList(List<String> listImg){
+        Set<String> setListImg = new HashSet<>();
+
+        for (String i: listImg) {
+            setListImg.add(i);
+        }
+        DataLocalManager.getInstance().mySharedPreferences.deleteListFavor(PREF_IMG_FAVOR);
+
+        DataLocalManager.getInstance().mySharedPreferences.putStringSet(PREF_IMG_FAVOR, setListImg);
+
+    }
+
+    public static List<String> getListImg1(){
+        Set<String> strJsonArray = DataLocalManager.getInstance().mySharedPreferences.getStringSet(PREF_IMG_FAVOR);
+
+        List<String> listImg = new ArrayList<>();
+
+        for (String i: strJsonArray) {
+            listImg.add(i);
+        }
+
+
+        return listImg;
+    }
+
+    public static Set<String> getListSet(){
+        Set<String> setImg = DataLocalManager.getInstance().mySharedPreferences.getStringSet(PREF_IMG_FAVOR);
+        return setImg;
+    }
+
 }

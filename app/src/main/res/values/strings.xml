@@ -12,4 +12,5 @@
     <string name="your_answer_for_the_question_above">Your answer for the question above</string>
     <string name="create">Create</string>
     <string name="question">Question: What is your favorite number?</string>
+    <string name="unknown">Unknown</string>
 </resources>

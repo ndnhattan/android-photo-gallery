@@ -3,6 +3,8 @@ package com.nhom12.test.adapter;
 import android.annotation.SuppressLint;
 import android.app.usage.ExternalStorageStats;
 import android.content.ContentValues;
+import android.app.Activity;
+import android.app.usage.ExternalStorageStats;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
@@ -28,6 +30,8 @@ import com.nhom12.test.activities.DetailPhotoActivity;
 
 import androidx.recyclerview.widget.RecyclerView;
 
+import java.util.ArrayList;
+
 public class GridImageAdapter extends RecyclerView.Adapter<GridImageAdapter.ViewHolder> {
     private Cursor rs;
     private Context context;
@@ -37,6 +41,21 @@ public class GridImageAdapter extends RecyclerView.Adapter<GridImageAdapter.View
         this.context = context;
         this.rs = rs;
         this.index = index;
+
+public class GridImageAdapter extends RecyclerView.Adapter<GridImageAdapter.ViewHolder> {
+    private Cursor rs;
+    private Context context;
+
+    private ArrayList<String> album;
+    private static int REQUEST_CODE_PIC = 10;
+
+    public GridImageAdapter(ArrayList<String> album) {
+        this.album = album;
+    }
+
+    public GridImageAdapter(Context context, Cursor rs) {
+        this.context = context;
+        this.rs = rs;
     }
 
     @Override
