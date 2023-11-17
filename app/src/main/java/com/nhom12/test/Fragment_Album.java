@@ -187,23 +187,25 @@ public class Fragment_Album extends Fragment {
                             @Override
                             public void onClick(View view) {
                                 String name = edtCreateAlbum.getText().toString();
-                                albumDbHelper.addAlbum(name, "");
-                                Album newAlbum = new Album(name);
-                                albumList.add(newAlbum);
-                                Toast.makeText(main, "Created", Toast.LENGTH_SHORT).show();
-                                adapter = new GridAlbumAdapter(main, albumList);
-                                myGridView.setAdapter(adapter);
-                                adapter.setOnItemClickListener(new OnItemClickListener() {
-                                    @Override
-                                    public void onItemClick(int position) {
-                                        // Xử lý khi một item được click
-                                        Toast.makeText(main, "Name: " + albumList.get(position).getName(), Toast.LENGTH_SHORT).show();
-                                        Fragment_Album_Photo fragmentPhoto = Fragment_Album_Photo.newInstance(albumList.get(position).getName());
-                                        FragmentTransaction fr = getFragmentManager().beginTransaction();
-                                        fr.replace(R.id.body_container, fragmentPhoto);
-                                        fr.commit();
-                                    }
-                                });
+                                if(!name.equals("")){
+                                    albumDbHelper.addAlbum(name, "");
+                                    Album newAlbum = new Album(name);
+                                    albumList.add(newAlbum);
+                                    Toast.makeText(main, "Created", Toast.LENGTH_SHORT).show();
+                                    adapter = new GridAlbumAdapter(main, albumList);
+                                    myGridView.setAdapter(adapter);
+                                    adapter.setOnItemClickListener(new OnItemClickListener() {
+                                        @Override
+                                        public void onItemClick(int position) {
+                                            // Xử lý khi một item được click
+                                            Toast.makeText(main, "Name: " + albumList.get(position).getName(), Toast.LENGTH_SHORT).show();
+                                            Fragment_Album_Photo fragmentPhoto = Fragment_Album_Photo.newInstance(albumList.get(position).getName());
+                                            FragmentTransaction fr = getFragmentManager().beginTransaction();
+                                            fr.replace(R.id.body_container, fragmentPhoto);
+                                            fr.commit();
+                                        }
+                                    });
+                                }
                                 dialog.dismiss();
                             }
                         });

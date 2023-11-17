@@ -123,7 +123,7 @@ public class DetailRemovePhotoActivity extends AppCompatActivity {
 
     }
 
-    public void onBackPressed() {
+    public void onBackPressedExit() {
         finish(); // Kết thúc activity hiện tại
         // Mở lại activity trước đó
         Intent intent = new Intent(DetailRemovePhotoActivity.this, MainActivity.class);
@@ -161,7 +161,7 @@ public class DetailRemovePhotoActivity extends AppCompatActivity {
                 deleteImageFromMediaStore(DetailRemovePhotoActivity.this,imageId);
                 albumDbHelper.deleteImageById(imageId);
                 dialog.dismiss();
-                onBackPressed();
+                onBackPressedExit();
             }
         });
 

@@ -33,10 +33,12 @@ import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.bumptech.glide.request.RequestOptions;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.nhom12.test.Fragment_Album;
+import com.nhom12.test.Fragment_Album_Choose;
 import com.nhom12.test.Fragment_Album_Photo;
 import com.nhom12.test.Fragment_Favorite;
 import com.nhom12.test.Fragment_Photo;
 import com.nhom12.test.Fragment_Private;
+import com.nhom12.test.MainActivity;
 import com.nhom12.test.OnItemClickListener;
 import com.nhom12.test.R;
 import com.nhom12.test.adapter.GridAlbumAdapter;
@@ -84,6 +86,19 @@ public class DetailPhotoActivity extends AppCompatActivity {
         String formattedTime = dateFormat.format(date);
 
         mToolbar = (Toolbar) findViewById(R.id.toolbar_detail_photo);
+
+        mToolbar.setOnMenuItemClickListener(item -> {
+            int id = item.getItemId();
+
+            if (id == R.id.move_to_album) {
+                Fragment fragment = Fragment_Album_Choose.newInstance(imageId);
+                getSupportFragmentManager().beginTransaction().replace(R.id.body_container_detail, fragment).commit();
+                return true;
+            } else
+                return false;
+
+        });
+
         txtDate = (TextView) findViewById(R.id.date);
         txtTime = (TextView) findViewById(R.id.time);
         txtDate.setText(String.valueOf(day) + " tháng " + String.valueOf(month) + ", năm " + String.valueOf(year));
@@ -257,5 +272,9 @@ public class DetailPhotoActivity extends AppCompatActivity {
             }
         });
         dialog.show();
+    }
+
+    public void onBackPressedExit() {
+        finish(); // Kết thúc activity hiện tại
     }
 }

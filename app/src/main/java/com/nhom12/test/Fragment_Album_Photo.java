@@ -5,6 +5,7 @@ import android.os.Bundle;
 
 import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentTransaction;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -44,6 +45,7 @@ public class Fragment_Album_Photo extends Fragment {
     MainActivity main;
     RecyclerView recyclerView;
     AlbumDbHelper albumDbHelper;
+    Toolbar mToolbar;
 
     public Fragment_Album_Photo() {
         // Required empty public constructor
@@ -84,26 +86,36 @@ public class Fragment_Album_Photo extends Fragment {
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(main);
         recyclerView.setLayoutManager(linearLayoutManager);
 
-//        mToolbar = (Toolbar) rootView.findViewById(R.id.toolbar_photo);
-//        mToolbar.setOnMenuItemClickListener(item -> {
-//            int id = item.getItemId();
-//
-//            if (id == R.id.camera) {
-//                Toast.makeText(getActivity(), "Camera", Toast.LENGTH_LONG).show();
-//                return true;
-//            } else if (id == R.id.search) {
-//                Toast.makeText(getActivity(), "Search", Toast.LENGTH_LONG).show();
-//                return true;
-//            } else if(id == R.id.color){
-//                Toast.makeText(getActivity(), "Color", Toast.LENGTH_LONG).show();
-//                return true;
-//            } else if(id == R.id.setting){
-//                Toast.makeText(getActivity(), "Settings", Toast.LENGTH_LONG).show();
-//                return true;
-//            } else
-//                return false;
-//
-//        });
+        mToolbar = (Toolbar) rootView.findViewById(R.id.toolbar_photo);
+        mToolbar.setNavigationIcon(getResources().getDrawable(R.drawable.ic_arrow_back));
+        mToolbar.setNavigationOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Fragment_Album fragmentAlbum = new Fragment_Album(); //fragment hien thi danh sach cac anh theo ten album
+                FragmentTransaction fr = getFragmentManager().beginTransaction();
+                fr.replace(R.id.body_container, fragmentAlbum);
+                fr.commit();
+            }
+        });
+        mToolbar.setOnMenuItemClickListener(item -> {
+            int id = item.getItemId();
+
+            if (id == R.id.camera) {
+                Toast.makeText(getActivity(), "Camera", Toast.LENGTH_LONG).show();
+                return true;
+            } else if (id == R.id.search) {
+                Toast.makeText(getActivity(), "Search", Toast.LENGTH_LONG).show();
+                return true;
+            } else if(id == R.id.color){
+                Toast.makeText(getActivity(), "Color", Toast.LENGTH_LONG).show();
+                return true;
+            } else if(id == R.id.setting){
+                Toast.makeText(getActivity(), "Settings", Toast.LENGTH_LONG).show();
+                return true;
+            } else
+                return false;
+
+        });
 
         return rootView;
     }
