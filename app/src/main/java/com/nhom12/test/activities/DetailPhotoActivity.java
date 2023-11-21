@@ -84,7 +84,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-public class DetailPhotoActivity extends AppCompatActivity {
+public class DetailPhotoActivity extends AppCompatActivity{
     ImageView detailImage;
     Toolbar mToolbar;
     TextView txtDate, txtTime;
@@ -97,7 +97,7 @@ public class DetailPhotoActivity extends AppCompatActivity {
     private int pos;
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    protected void onCreate(Bundle savedInstanceState){
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_detail_photo);
 
@@ -166,8 +166,7 @@ public class DetailPhotoActivity extends AppCompatActivity {
 
                         Toast.makeText(getApplicationContext(), "Error: " + e.getMessage(), Toast.LENGTH_LONG).show();
                     }
-                }
-                else if(key == R.id.btn_info){
+                } else if (key == R.id.btn_info) {
                     File imageFile = new File(value);
                     Uri targetUri = Uri.fromFile(imageFile);
                     if (targetUri != null) {
@@ -193,7 +192,9 @@ public class DetailPhotoActivity extends AppCompatActivity {
             return true;
         });
         detailImage.setOnTouchListener(new OnSwipeTouchListener(this) {
-            public void onClick() {
+
+
+            public void onClickUp() {
                 if (flag) {
                     mToolbar.setVisibility(View.INVISIBLE);
                     navigation.setVisibility(View.INVISIBLE);
@@ -204,7 +205,6 @@ public class DetailPhotoActivity extends AppCompatActivity {
                     flag = true;
                 }
             }
-
             public void onSwipeRight() {
                 if (Fragment_Photo.index > 0) {
                     Fragment_Photo.index = Fragment_Photo.index - 1;
@@ -261,10 +261,9 @@ public class DetailPhotoActivity extends AppCompatActivity {
                 Intent myIntent = new Intent(this, EditActivity.class);
                 myIntent.putExtra("path", value);
                 this.startActivity(myIntent);
-            } else if(key == R.id.menu_detail_delete){
+            } else if (key == R.id.menu_detail_delete) {
                 displayDialogAndRemove(imageId);
-            }
-            else if (key == R.id.menu_detail_share){
+            } else if (key == R.id.menu_detail_share) {
                 Drawable mDrawable = Drawable.createFromPath(value);
                 Bitmap mBitmap = ((BitmapDrawable) mDrawable).getBitmap();
                 String path = MediaStore.Images.Media.insertImage(getContentResolver(), mBitmap, "Image Description", null);
@@ -303,17 +302,17 @@ public class DetailPhotoActivity extends AppCompatActivity {
     }
 
     // Dialog for remove
-    public void displayDialogAndRemove(long imageId){
+    public void displayDialogAndRemove(long imageId) {
         final Dialog dialog = new Dialog(DetailPhotoActivity.this);
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
         dialog.setContentView(R.layout.layout_check);
         Window window = dialog.getWindow();
-        if(window == null){
+        if (window == null) {
             return;
         }
         window.setLayout(WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.WRAP_CONTENT);
 
-        WindowManager.LayoutParams windowAttributes= window.getAttributes();
+        WindowManager.LayoutParams windowAttributes = window.getAttributes();
         windowAttributes.gravity = Gravity.CENTER;
         window.setAttributes(windowAttributes);
 
@@ -343,6 +342,7 @@ public class DetailPhotoActivity extends AppCompatActivity {
     public void onBackPressedExit() {
         finish(); // Kết thúc activity hiện tại
     }
+
     private void showInfo(Uri imgUri, String value) {
         if (imgUri != null) {
 
@@ -361,7 +361,6 @@ public class DetailPhotoActivity extends AppCompatActivity {
                 TextView txtInfoProducer = (TextView) infoDialogView.findViewById(R.id.txtInfoProducer);
                 TextView txtInfoReso = (TextView) infoDialogView.findViewById(R.id.txtInfoReso);
                 TextView txtInfoModel = (TextView) infoDialogView.findViewById(R.id.txtInfoModel);
-
 
 
                 TextView txtInfoTime = (TextView) infoDialogView.findViewById(R.id.txtInfoTime);
@@ -413,5 +412,4 @@ public class DetailPhotoActivity extends AppCompatActivity {
                     Toast.LENGTH_LONG).show();
         }
     }
-
 }

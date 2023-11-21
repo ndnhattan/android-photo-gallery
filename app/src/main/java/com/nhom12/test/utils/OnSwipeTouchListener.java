@@ -1,11 +1,13 @@
 package com.nhom12.test.utils;
 
 import android.content.Context;
+import android.util.Log;
 import android.view.GestureDetector;
 import android.view.GestureDetector.SimpleOnGestureListener;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnTouchListener;
+import android.widget.Toast;
 
 public class OnSwipeTouchListener implements OnTouchListener {
 
@@ -26,8 +28,13 @@ public class OnSwipeTouchListener implements OnTouchListener {
         private static final int SWIPE_VELOCITY_THRESHOLD = 100;
 
         @Override
+        public boolean onSingleTapUp(MotionEvent event) {
+            onClickUp();
+            return true;
+        }
+
+        @Override
         public boolean onDown(MotionEvent e) {
-            onClick();
             return true;
         }
 
@@ -62,7 +69,7 @@ public class OnSwipeTouchListener implements OnTouchListener {
         }
     }
 
-    public void onClick(){
+    public void onClickUp(){
 
     }
 
