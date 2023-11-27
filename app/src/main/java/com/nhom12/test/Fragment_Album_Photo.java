@@ -38,7 +38,7 @@ public class Fragment_Album_Photo extends Fragment {
     private static final String ARG_PARAM1 = "param1";
 
     // TODO: Rename and change types of parameters
-    private String albumName;
+    private long albumID;
 
     //
     ArrayList<Cursor> rs = new ArrayList<>();
@@ -52,10 +52,10 @@ public class Fragment_Album_Photo extends Fragment {
     }
 
     // TODO: Rename and change types and number of parameters
-    public static Fragment_Album_Photo newInstance(String albumName) {
+    public static Fragment_Album_Photo newInstance(long albumID) {
         Fragment_Album_Photo fragment = new Fragment_Album_Photo();
         Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, albumName);
+        args.putLong(ARG_PARAM1, albumID);
         fragment.setArguments(args);
         return fragment;
     }
@@ -64,7 +64,7 @@ public class Fragment_Album_Photo extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
-            albumName = getArguments().getString(ARG_PARAM1);
+            albumID = getArguments().getLong(ARG_PARAM1);
         }
         setHasOptionsMenu(true);
         try {
@@ -81,7 +81,7 @@ public class Fragment_Album_Photo extends Fragment {
 
         recyclerView = (RecyclerView) rootView.findViewById(R.id.recyclerView);
         rs.clear();
-        listImages(albumName); // tim nhung anh co cung album name luu vao rs
+        listImages(albumID); // tim nhung anh co cung album name luu vao rs
         recyclerView.setAdapter(new ListAlbumImageAdapter(main, rs));
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(main);
         recyclerView.setLayoutManager(linearLayoutManager);
@@ -120,11 +120,10 @@ public class Fragment_Album_Photo extends Fragment {
         return rootView;
     }
 
-    private void listImages(String albumName) {
-        Cursor result = albumDbHelper.readImageByAlbum(albumName);
+    private void listImages(long albumID) {
+        Cursor result = albumDbHelper.readImageByAlbumID(albumID);
         int position = 0;
         int preyear = 0, premonth = 0, preday = 0;
-        System.out.println(result.getCount());
         while (result.moveToNext()) {
             String imageDate = result.getString(2);
             Timestamp tms = new Timestamp(Long.parseLong(imageDate) * 1000);
@@ -150,7 +149,7 @@ public class Fragment_Album_Photo extends Fragment {
             long endOfMonth = startOfMonth + 24 * 60 * 60;
 
             // Define the selection arguments
-            Cursor monthImage = albumDbHelper.readImageByAlbumAndByDate(albumName, startOfMonth, endOfMonth);
+            Cursor monthImage = albumDbHelper.readImageByAlbumIDAndByDate(albumID, startOfMonth, endOfMonth);
 
             rs.add(monthImage);
             position += monthImage.getCount() - 1;

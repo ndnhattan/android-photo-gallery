@@ -45,7 +45,7 @@ public class GridAlbumImageAdapter extends RecyclerView.Adapter<GridAlbumImageAd
         rs.moveToPosition(position);
         String path = rs.getString(1);
         long imageId = rs.getLong(0);
-        String albumName = rs.getString(3);
+        Long albumID = rs.getLong(3);
 
         // Create RequestOptions to specify image loading options
         RequestOptions options = new RequestOptions()
@@ -63,12 +63,13 @@ public class GridAlbumImageAdapter extends RecyclerView.Adapter<GridAlbumImageAd
         holder.imageView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(albumName.equals("Remove")){
+                if(albumID == 2){
                     Intent myIntentRemove = new Intent(context, DetailRemovePhotoActivity.class);
                     myIntentRemove.putExtra("path", path);
                     String imageDate = rs.getString(2);
                     myIntentRemove.putExtra("date", imageDate);
                     myIntentRemove.putExtra("id", imageId);
+                    myIntentRemove.putExtra("albumId", albumID);
                     context.startActivity(myIntentRemove);
                 } else {
                     Intent myIntent = new Intent(context, DetailPhotoActivity.class);
@@ -76,6 +77,7 @@ public class GridAlbumImageAdapter extends RecyclerView.Adapter<GridAlbumImageAd
                     String imageDate = rs.getString(2);
                     myIntent.putExtra("date", imageDate);
                     myIntent.putExtra("id", imageId);
+                    myIntent.putExtra("albumId", albumID);
                     context.startActivity(myIntent);
                 }
             }

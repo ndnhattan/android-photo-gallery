@@ -108,6 +108,7 @@ public class DetailPhotoActivity extends AppCompatActivity{
         String value = intent.getStringExtra("path");
         String imageDate = intent.getStringExtra("date");
         long imageId = intent.getLongExtra("id", 0); // dt
+        long albumId = intent.getLongExtra("albumId", 0); // dt
 
 
         Instant instant = Instant.ofEpochMilli(Long.parseLong(imageDate) * 1000);
@@ -125,7 +126,7 @@ public class DetailPhotoActivity extends AppCompatActivity{
             int id = item.getItemId();
 
             if (id == R.id.move_to_album) {
-                Fragment fragment = Fragment_Album_Choose.newInstance(imageId);
+                Fragment fragment = Fragment_Album_Choose.newInstance(imageId, albumId);
                 getSupportFragmentManager().beginTransaction().replace(R.id.body_container_detail, fragment).commit();
                 return true;
             } else
@@ -150,7 +151,7 @@ public class DetailPhotoActivity extends AppCompatActivity{
             public boolean onMenuItemClick(MenuItem item) {
                 int key = item.getItemId();
                 if (key == R.id.move_to_album) {
-                    Fragment fragment = Fragment_Album_Choose.newInstance(imageId);
+                    Fragment fragment = Fragment_Album_Choose.newInstance(imageId, albumId);
                     getSupportFragmentManager().beginTransaction().replace(R.id.body_container_detail, fragment).commit();
                 }
                 if (key == R.id.add_to_favor) {
@@ -262,7 +263,7 @@ public class DetailPhotoActivity extends AppCompatActivity{
                 myIntent.putExtra("path", value);
                 this.startActivity(myIntent);
             } else if (key == R.id.menu_detail_delete) {
-                displayDialogAndRemove(imageId);
+                displayDialogAndRemove(imageId, albumId);
             } else if (key == R.id.menu_detail_share) {
                 Drawable mDrawable = Drawable.createFromPath(value);
                 Bitmap mBitmap = ((BitmapDrawable) mDrawable).getBitmap();
@@ -302,7 +303,7 @@ public class DetailPhotoActivity extends AppCompatActivity{
     }
 
     // Dialog for remove
-    public void displayDialogAndRemove(long imageId) {
+    public void displayDialogAndRemove(long imageId, long albumId) {
         final Dialog dialog = new Dialog(DetailPhotoActivity.this);
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
         dialog.setContentView(R.layout.layout_check);
@@ -323,7 +324,7 @@ public class DetailPhotoActivity extends AppCompatActivity{
         btnSubmit.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                albumDbHelper.moveImageToAlbum(imageId, "Remove");
+                albumDbHelper.moveImageToAlbum(imageId, albumId,2); // 2 la id mac dinh cua album remove
                 dialog.dismiss();
                 finish();
 

@@ -111,6 +111,12 @@ public class Fragment_Album extends Fragment {
         Cursor result = main.getContentResolver().query(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, projection, null, null, sortOrder);
         String currentAlbumName = null;
         result.moveToPosition(-1);
+        // Add album favorite
+        albumDbHelper.addAlbum("Favorite", -1); // id 1
+        // Add album remove
+        albumDbHelper.addAlbum("Remove", -1); // id 2
+        // Add album private
+        albumDbHelper.addAlbum("Private", -1);
         while (result.moveToNext()) {
             int bucketNameColIndex = result.getColumnIndex(MediaStore.Images.Media.BUCKET_DISPLAY_NAME);
             String bucketName = result.getString(bucketNameColIndex);
@@ -123,29 +129,23 @@ public class Fragment_Album extends Fragment {
 
             if(currentAlbumName == null || !currentAlbumName.equals(bucketName)){
                 currentAlbumName = bucketName;
-                albumDbHelper.addAlbum(bucketName, imagesData);
+                albumDbHelper.addAlbum(bucketName, id);
             }
-
-            // Add album favorite
-            albumDbHelper.addAlbum("Favorite", "");
-            // Add album remove
-            albumDbHelper.addAlbum("Remove", "");
-            // Add album private
-            albumDbHelper.addAlbum("Private", "");
-
-            albumDbHelper.addImage(id,imagesData, imageDate, bucketName);
+            long albumID = albumDbHelper.getAlbumIdByAlbumName(bucketName);
+            albumDbHelper.addImage(id,imagesData, imageDate);
+            albumDbHelper.addAlbumImage(albumID, id);
         }
     }
 
     public void loadAllALbum(){
         Cursor cursor = albumDbHelper.readAllAlbum();
-        Album currenAlbum;
+        Album currentAlbum;
         albumList.clear();
         cursor.moveToPosition(-1);
         while(cursor.moveToNext()){
-            currenAlbum = new Album(cursor.getString(0));
-            currenAlbum.addFirstImagesData(cursor.getString(1));
-            albumList.add(currenAlbum);
+            String imageData = albumDbHelper.getImagePathByImageId(cursor.getLong(2));
+            currentAlbum = new Album(cursor.getLong(0), cursor.getString(1),imageData);
+            albumList.add(currentAlbum);
         }
     }
 
@@ -189,8 +189,9 @@ public class Fragment_Album extends Fragment {
                             public void onClick(View view) {
                                 String name = edtCreateAlbum.getText().toString();
                                 if(!name.equals("")){
-                                    albumDbHelper.addAlbum(name, "");
-                                    Album newAlbum = new Album(name);
+                                    albumDbHelper.addAlbum(name, -1);
+                                    long albumID = albumDbHelper.getAlbumIdByAlbumName(name);
+                                    Album newAlbum = new Album(albumID, name, "");
                                     albumList.add(newAlbum);
                                     Toast.makeText(main, "Created", Toast.LENGTH_SHORT).show();
                                     adapter = new GridAlbumAdapter(main, albumList);
@@ -200,7 +201,7 @@ public class Fragment_Album extends Fragment {
                                         public void onItemClick(int position) {
                                             // Xử lý khi một item được click
                                             Toast.makeText(main, "Name: " + albumList.get(position).getName(), Toast.LENGTH_SHORT).show();
-                                            Fragment_Album_Photo fragmentPhoto = Fragment_Album_Photo.newInstance(albumList.get(position).getName());
+                                            Fragment_Album_Photo fragmentPhoto = Fragment_Album_Photo.newInstance(albumList.get(position).getAlbumID());
                                             FragmentTransaction fr = getFragmentManager().beginTransaction();
                                             fr.replace(R.id.body_container, fragmentPhoto);
                                             fr.commit();
@@ -242,7 +243,7 @@ public class Fragment_Album extends Fragment {
             @Override
             public void onItemClick(int position) {
                 // Xử lý khi một item được click
-                Fragment_Album_Photo fragmentPhoto = Fragment_Album_Photo.newInstance(albumList.get(position).getName()); //fragment hien thi danh sach cac anh theo ten album
+                Fragment_Album_Photo fragmentPhoto = Fragment_Album_Photo.newInstance(albumList.get(position).getAlbumID()); //fragment hien thi danh sach cac anh theo ten album
                 FragmentTransaction fr = getFragmentManager().beginTransaction();
                 fr.replace(R.id.body_container, fragmentPhoto);
                 fr.commit();
