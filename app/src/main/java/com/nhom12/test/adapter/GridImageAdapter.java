@@ -27,6 +27,8 @@ import com.bumptech.glide.request.RequestOptions;
 import com.nhom12.test.Fragment_Photo;
 import com.nhom12.test.R;
 import com.nhom12.test.activities.DetailPhotoActivity;
+import com.nhom12.test.database.AlbumDbHelper;
+import com.nhom12.test.database.DatabaseSingleton;
 
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -38,6 +40,7 @@ public class GridImageAdapter extends RecyclerView.Adapter<GridImageAdapter.View
     private int index;
     private ArrayList<String> album;
     private static int REQUEST_CODE_PIC = 10;
+    AlbumDbHelper albumDbHelper; // db
 
     public GridImageAdapter(Context context, Cursor rs, int index) {
         this.context = context;
@@ -59,6 +62,7 @@ public class GridImageAdapter extends RecyclerView.Adapter<GridImageAdapter.View
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         Context context = parent.getContext();
         LayoutInflater inflater = LayoutInflater.from(context);
+        albumDbHelper = DatabaseSingleton.getInstance(context).getDbHelper();
 
         View view = inflater.inflate(R.layout.item_grid_image, parent, false);
 
@@ -74,6 +78,7 @@ public class GridImageAdapter extends RecyclerView.Adapter<GridImageAdapter.View
 
         int idColumnIndex = rs.getColumnIndex(MediaStore.Images.Media._ID);
         long imageId = rs.getLong(idColumnIndex);
+        long albumId = albumDbHelper.getAlbumIdByImageId(imageId);
 
         // Create RequestOptions to specify image loading options
         RequestOptions options = new RequestOptions()
@@ -99,6 +104,7 @@ public class GridImageAdapter extends RecyclerView.Adapter<GridImageAdapter.View
                 String imageDate = rs.getString(dateColumnIndex);
                 myIntent.putExtra("date", imageDate);
                 myIntent.putExtra("id", imageId); // dt
+                myIntent.putExtra("albumId", albumId); // dt
                 context.startActivity(myIntent);
             }
         });

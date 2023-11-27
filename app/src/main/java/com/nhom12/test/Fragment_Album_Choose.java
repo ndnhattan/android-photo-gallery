@@ -33,10 +33,11 @@ public class Fragment_Album_Choose extends Fragment {
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
+    private static final String ARG_PARAM2 = "param2";
 
     // TODO: Rename and change types of parameters
     private long imageId;
-
+    private long albumId;
 
     // Variable
     DetailPhotoActivity mainDetail;
@@ -56,10 +57,11 @@ public class Fragment_Album_Choose extends Fragment {
      * @return A new instance of fragment Fragment_Album_Choose.
      */
     // TODO: Rename and change types and number of parameters
-    public static Fragment_Album_Choose newInstance(long imageId) {
+    public static Fragment_Album_Choose newInstance(long imageId, long albumId) {
         Fragment_Album_Choose fragment = new Fragment_Album_Choose();
         Bundle args = new Bundle();
         args.putLong(ARG_PARAM1, imageId);
+        args.putLong(ARG_PARAM2, albumId);
         fragment.setArguments(args);
         return fragment;
     }
@@ -69,6 +71,7 @@ public class Fragment_Album_Choose extends Fragment {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
             imageId = getArguments().getLong(ARG_PARAM1);
+            albumId = getArguments().getLong(ARG_PARAM2);
         }
         setHasOptionsMenu(true);
         try {
@@ -95,7 +98,7 @@ public class Fragment_Album_Choose extends Fragment {
             @Override
             public void onItemClick(int position) {
                 // Xử lý khi một item được click
-                albumDbHelper.moveImageToAlbum(imageId, albumList.get(position).getName());
+                albumDbHelper.moveImageToAlbum(imageId, albumId, albumList.get(position).getAlbumID());
                 Toast.makeText(mainDetail, "Move Successfull", Toast.LENGTH_SHORT).show();
                 mainDetail.onBackPressedExit();
             }
@@ -107,13 +110,13 @@ public class Fragment_Album_Choose extends Fragment {
 
     public void loadAllALbum(){
         Cursor cursor = albumDbHelper.readAllAlbum();
-        Album currenAlbum;
+        Album currentAlbum;
         albumList.clear();
         cursor.moveToPosition(-1);
         while(cursor.moveToNext()){
-            currenAlbum = new Album(cursor.getString(0));
-            currenAlbum.addFirstImagesData(cursor.getString(1));
-            albumList.add(currenAlbum);
+            String imageData = albumDbHelper.getImagePathByImageId(cursor.getLong(2));
+            currentAlbum = new Album(cursor.getLong(0), cursor.getString(1), imageData);
+            albumList.add(currentAlbum);
         }
     }
 }
