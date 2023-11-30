@@ -211,8 +211,7 @@ public class DetailPhotoActivity extends AppCompatActivity{
                     Fragment_Photo.index = Fragment_Photo.index - 1;
                     Fragment_Photo.result.moveToPosition(Fragment_Photo.index);
                     String path = Fragment_Photo.result.getString(1);
-                    int dateColumnIndex = Fragment_Photo.result.getColumnIndex(MediaStore.Images.Media.DATE_ADDED);
-                    String imageDate = Fragment_Photo.result.getString(dateColumnIndex);
+                    String imageDate = Fragment_Photo.result.getString(2);
 
                     Instant instant = Instant.ofEpochMilli(Long.parseLong(imageDate) * 1000);
                     ZonedDateTime zonedDateTime = instant.atZone(ZoneId.systemDefault());
@@ -235,8 +234,7 @@ public class DetailPhotoActivity extends AppCompatActivity{
                     Fragment_Photo.index = Fragment_Photo.index + 1;
                     Fragment_Photo.result.moveToPosition(Fragment_Photo.index);
                     String path = Fragment_Photo.result.getString(1);
-                    int dateColumnIndex = Fragment_Photo.result.getColumnIndex(MediaStore.Images.Media.DATE_ADDED);
-                    String imageDate = Fragment_Photo.result.getString(dateColumnIndex);
+                    String imageDate = Fragment_Photo.result.getString(2);
 
                     Instant instant = Instant.ofEpochMilli(Long.parseLong(imageDate) * 1000);
                     ZonedDateTime zonedDateTime = instant.atZone(ZoneId.systemDefault());
@@ -259,8 +257,9 @@ public class DetailPhotoActivity extends AppCompatActivity{
             int key = item.getItemId();
 
             if (key == R.id.menu_detail_edit) {
+                String path = Fragment_Photo.result.getString(1);
                 Intent myIntent = new Intent(this, EditActivity.class);
-                myIntent.putExtra("path", value);
+                myIntent.putExtra("path", path);
                 this.startActivity(myIntent);
             } else if (key == R.id.menu_detail_delete) {
                 displayDialogAndRemove(imageId, albumId);

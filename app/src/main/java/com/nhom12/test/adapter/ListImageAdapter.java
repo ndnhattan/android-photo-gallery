@@ -43,8 +43,7 @@ public class ListImageAdapter extends RecyclerView.Adapter<ListImageAdapter.View
         Cursor result = rs.get(position);
 
         result.moveToFirst();
-        int dateColumnIndex = result.getColumnIndex(MediaStore.Images.Media.DATE_ADDED);
-        String imageDate = result.getString(dateColumnIndex);
+        String imageDate = result.getString(2);
         Timestamp tms = new Timestamp(Long.parseLong(imageDate) * 1000);
         Date date = new Date(tms.getTime());
         int year = date.getYear();

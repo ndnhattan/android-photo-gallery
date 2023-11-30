@@ -299,5 +299,32 @@ public class AlbumDbHelper extends SQLiteOpenHelper {
         return -1; // Trả về -1 nếu không tìm thấy album_id cho image_id
     }
 
+    public Cursor readAllImages(){
+        String query = "SELECT * FROM " + TABLE_IMAGES +
+        " ORDER BY " + IMAGE_DATE + " DESC";
+        SQLiteDatabase db = this.getReadableDatabase();
+
+        Cursor cursor = null;
+        if(db != null){
+            cursor = db.rawQuery(query, null);
+        }
+        return cursor;
+    }
+
+    public Cursor readImageByDate(long startOfMonth, long endOfMonth){
+        SQLiteDatabase db = this.getReadableDatabase();
+        String query = "SELECT " + TABLE_IMAGES + ".*" +
+                " FROM " + TABLE_IMAGES +
+                " WHERE " + TABLE_IMAGES + "." + IMAGE_DATE + " >= ?" +
+                " AND " + TABLE_IMAGES + "." + IMAGE_DATE + " < ?" +
+                " ORDER BY " + IMAGE_DATE + " DESC";
+
+        Cursor cursor = null;
+        if (db != null) {
+            cursor = db.rawQuery(query, new String[]{String.valueOf(startOfMonth), String.valueOf(endOfMonth)});
+        }
+
+        return cursor;
+    }
 
 }

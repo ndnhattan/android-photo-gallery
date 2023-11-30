@@ -73,11 +73,9 @@ public class GridImageAdapter extends RecyclerView.Adapter<GridImageAdapter.View
     @Override
     public void onBindViewHolder(ViewHolder holder, @SuppressLint("RecyclerView") int position) {
         rs.moveToPosition(position);
-        int pathColumnIndex = rs.getColumnIndex(MediaStore.Images.Media.DATA);
-        String path = rs.getString(pathColumnIndex);
+        String path = rs.getString(1);
 
-        int idColumnIndex = rs.getColumnIndex(MediaStore.Images.Media._ID);
-        long imageId = rs.getLong(idColumnIndex);
+        long imageId = rs.getLong(0);
         long albumId = albumDbHelper.getAlbumIdByImageId(imageId);
 
         // Create RequestOptions to specify image loading options
@@ -100,8 +98,7 @@ public class GridImageAdapter extends RecyclerView.Adapter<GridImageAdapter.View
 
                 Intent myIntent = new Intent(context, DetailPhotoActivity.class);
                 myIntent.putExtra("path", path);
-                int dateColumnIndex = rs.getColumnIndex(MediaStore.Images.Media.DATE_ADDED);
-                String imageDate = rs.getString(dateColumnIndex);
+                String imageDate = rs.getString(2);
                 myIntent.putExtra("date", imageDate);
                 myIntent.putExtra("id", imageId); // dt
                 myIntent.putExtra("albumId", albumId); // dt
