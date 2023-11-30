@@ -25,15 +25,23 @@
 
     <!-- TODO: Update blank fragment layout -->
 
-    <GridView
+<!--    <GridView-->
+<!--        android:id="@+id/layout_grid_album"-->
+<!--        android:layout_width="match_parent"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        android:columnWidth="100dip"-->
+<!--        android:horizontalSpacing="5dip"-->
+<!--        android:numColumns="auto_fit"-->
+<!--        android:verticalSpacing="5dip"-->
+
+<!--        />-->
+
+    <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/layout_grid_album"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:verticalSpacing="5dip"
-        android:horizontalSpacing="5dip"
-        android:numColumns="auto_fit"
-        android:columnWidth="100dip"
-
-        />
+        android:background="@android:color/white"
+        android:clipToPadding="false"
+        android:scrollbars="vertical" />
 
 </LinearLayout>
