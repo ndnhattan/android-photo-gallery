@@ -264,10 +264,11 @@ public class AlbumDbHelper extends SQLiteOpenHelper {
         SQLiteDatabase db = this.getWritableDatabase();
 
         String selection = IMAGE_ID + " = ?";
+        String selection2 = AI_IMAGE_ID + " = ?";
         String[] selectionArgs = new String[]{String.valueOf(imageId)};
 
         db.delete(TABLE_IMAGES, selection, selectionArgs);
-        db.delete(TABLE_ALBUM_IMAGE, selection, selectionArgs);
+        db.delete(TABLE_ALBUM_IMAGE, selection2, selectionArgs);
     }
 
     public Cursor getImageById(long imageId) {

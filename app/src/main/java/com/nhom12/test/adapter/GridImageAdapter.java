@@ -73,7 +73,12 @@ public class GridImageAdapter extends RecyclerView.Adapter<GridImageAdapter.View
     @Override
     public void onBindViewHolder(ViewHolder holder, @SuppressLint("RecyclerView") int position) {
         rs.moveToPosition(position);
-        String path = rs.getString(1);
+        int pathColumnIndex = rs.getColumnIndex(MediaStore.Images.Media.DATA);
+        String path = rs.getString(pathColumnIndex);
+
+        int idColumnIndex = rs.getColumnIndex(MediaStore.Images.Media._ID);
+        long imageId = rs.getLong(idColumnIndex);
+        long albumId = albumDbHelper.getAlbumIdByImageId(imageId);
 
         long imageId = rs.getLong(0);
         long albumId = albumDbHelper.getAlbumIdByImageId(imageId);

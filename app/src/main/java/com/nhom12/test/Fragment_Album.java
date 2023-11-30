@@ -98,7 +98,44 @@ public class Fragment_Album extends Fragment {
         }
     }
 
+    private void listImages() {
 
+        String[] projection = {
+                MediaStore.Images.Media.BUCKET_DISPLAY_NAME,
+                MediaStore.Images.Media._ID,
+                MediaStore.Images.Media.DATA, // Path to the image file
+                MediaStore.Images.Media.DATE_ADDED
+        };
+        String sortOrder = MediaStore.Images.Media.BUCKET_DISPLAY_NAME + " ASC, " + MediaStore.Images.Media.DATE_ADDED + " DESC"; // Sort by date added in descending order
+
+        Cursor result = main.getContentResolver().query(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, projection, null, null, sortOrder);
+        String currentAlbumName = null;
+        result.moveToPosition(-1);
+        // Add album favorite
+        albumDbHelper.addAlbum("Favorite", -1); // id 1
+        // Add album remove
+        albumDbHelper.addAlbum("Remove", -1); // id 2
+        // Add album private
+        albumDbHelper.addAlbum("Private", -1);
+        while (result.moveToNext()) {
+            int bucketNameColIndex = result.getColumnIndex(MediaStore.Images.Media.BUCKET_DISPLAY_NAME);
+            String bucketName = result.getString(bucketNameColIndex);
+            int idColIndex = result.getColumnIndex(MediaStore.Images.Media._ID);
+            long id = result.getLong(idColIndex);
+            int imagesDataColIndex = result.getColumnIndex(MediaStore.Images.Media.DATA);
+            String imagesData = result.getString(imagesDataColIndex);
+            int dateColumnIndex = result.getColumnIndex(MediaStore.Images.Media.DATE_ADDED);
+            String imageDate = result.getString(dateColumnIndex);
+
+            if(currentAlbumName == null || !currentAlbumName.equals(bucketName)){
+                currentAlbumName = bucketName;
+                albumDbHelper.addAlbum(bucketName, id);
+            }
+            long albumID = albumDbHelper.getAlbumIdByAlbumName(bucketName);
+            albumDbHelper.addImage(id,imagesData, imageDate);
+            albumDbHelper.addAlbumImage(albumID, id);
+        }
+    }
 
     public void loadAllALbum(){
         Cursor cursor = albumDbHelper.readAllAlbum();
@@ -194,6 +231,7 @@ public class Fragment_Album extends Fragment {
 
         });
 
+        listImages();
         loadAllALbum();
         myGridView = ((RecyclerView) rootView.findViewById(R.id.layout_grid_album));
         adapter = new GridAlbumAdapter(main, albumList);

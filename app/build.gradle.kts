@@ -45,4 +45,5 @@ dependencies {
 
     implementation("com.theartofdev.edmodo:android-image-cropper:2.8.0")
     implementation("com.squareup.picasso:picasso:2.5.2")
+    implementation("com.burhanrashid52:photoeditor:3.0.1")
 }
