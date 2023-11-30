@@ -257,6 +257,7 @@ public class DetailPhotoActivity extends AppCompatActivity{
             int key = item.getItemId();
 
             if (key == R.id.menu_detail_edit) {
+                Log.e("test", String.valueOf(Fragment_Photo.result.getPosition()));
                 String path = Fragment_Photo.result.getString(1);
                 Intent myIntent = new Intent(this, EditActivity.class);
                 myIntent.putExtra("path", path);

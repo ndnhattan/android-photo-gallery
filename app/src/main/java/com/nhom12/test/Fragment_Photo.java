@@ -98,10 +98,6 @@ public class Fragment_Photo extends Fragment {
                 // Define the selection arguments
                 Cursor monthImage = albumDbHelper.readImageByDate(startOfMonth, endOfMonth);
 
-                Log.e("test", String.valueOf(result.getPosition()));
-                while (monthImage.moveToNext())
-                    Log.e("test", String.valueOf(monthImage.getPosition()));
-
                 rs.add(monthImage);
                 indexArr.add(position);
                 position += monthImage.getCount() - 1;
