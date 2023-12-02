@@ -54,29 +54,27 @@ public class GridAlbumAdapter extends RecyclerView.Adapter<GridAlbumAdapter.View
         String albumName = albumList.get(position).getName();
         holder.textView.setText(albumName);
         String pathFirstImage = albumList.get(position).getFirstImagesData();
-        if(!pathFirstImage.equals("")){
-            // Create RequestOptions to specify image loading options
-            RequestOptions options = new RequestOptions()
-                    //.placeholder(R.drawable.placeholder) // Placeholder image while loading
-                    //.error(R.drawable.error) // Error image if loading fails
-                    .diskCacheStrategy(DiskCacheStrategy.ALL); // Caching strategy
-
-            // Load the image with Glide
-            Glide.with(context)
-                    .load(albumList.get(position).getFirstImagesData())
-                    .apply(options) // Apply the RequestOptions
-                    .into(holder.imageView); // Display the image in the ImageView
-        } else {
             if(albumName.equals("Favorite")){
                 holder.imageView.setImageResource(R.drawable.icon_favorite_album);
             } else if (albumName.equals("Remove")){
                 holder.imageView.setImageResource(R.drawable.icon_garbage_album);
             } else if (albumName.equals("Private")){
                 holder.imageView.setImageResource(R.drawable.icon_private_album);
-            } else {
+            } else if(pathFirstImage.equals("")) {
                 holder.imageView.setImageResource(R.drawable.icon_create_default_album);
+            } else {
+                // Create RequestOptions to specify image loading options
+                RequestOptions options = new RequestOptions()
+                        //.placeholder(R.drawable.placeholder) // Placeholder image while loading
+                        //.error(R.drawable.error) // Error image if loading fails
+                        .diskCacheStrategy(DiskCacheStrategy.ALL); // Caching strategy
+
+                // Load the image with Glide
+                Glide.with(context)
+                        .load(albumList.get(position).getFirstImagesData())
+                        .apply(options) // Apply the RequestOptions
+                        .into(holder.imageView); // Display the image in the ImageView
             }
-        }
         holder.imageView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {

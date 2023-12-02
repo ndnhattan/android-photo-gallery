@@ -36,9 +36,11 @@ public class Fragment_Album_Photo extends Fragment {
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
+    private static final String ARG_PARAM2 = "param2";
 
     // TODO: Rename and change types of parameters
     private long albumID;
+    private String albumName;
 
     //
     ArrayList<Cursor> rs = new ArrayList<>();
@@ -52,10 +54,11 @@ public class Fragment_Album_Photo extends Fragment {
     }
 
     // TODO: Rename and change types and number of parameters
-    public static Fragment_Album_Photo newInstance(long albumID) {
+    public static Fragment_Album_Photo newInstance(long albumID, String albumName) {
         Fragment_Album_Photo fragment = new Fragment_Album_Photo();
         Bundle args = new Bundle();
         args.putLong(ARG_PARAM1, albumID);
+        args.putString(ARG_PARAM2, albumName);
         fragment.setArguments(args);
         return fragment;
     }
@@ -65,6 +68,7 @@ public class Fragment_Album_Photo extends Fragment {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
             albumID = getArguments().getLong(ARG_PARAM1);
+            albumName = getArguments().getString(ARG_PARAM2);
         }
         setHasOptionsMenu(true);
         try {
@@ -87,6 +91,7 @@ public class Fragment_Album_Photo extends Fragment {
         recyclerView.setLayoutManager(linearLayoutManager);
 
         mToolbar = (Toolbar) rootView.findViewById(R.id.toolbar_photo);
+        mToolbar.setTitle(albumName);
         mToolbar.setNavigationIcon(getResources().getDrawable(R.drawable.ic_arrow_back));
         mToolbar.setNavigationOnClickListener(new View.OnClickListener() {
             @Override
