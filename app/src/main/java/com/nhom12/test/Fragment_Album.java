@@ -201,7 +201,7 @@ public class Fragment_Album extends Fragment {
                                         public void onItemClick(int position) {
                                             // Xử lý khi một item được click
                                             Toast.makeText(main, "Name: " + albumList.get(position).getName(), Toast.LENGTH_SHORT).show();
-                                            Fragment_Album_Photo fragmentPhoto = Fragment_Album_Photo.newInstance(albumList.get(position).getAlbumID());
+                                            Fragment_Album_Photo fragmentPhoto = Fragment_Album_Photo.newInstance(albumList.get(position).getAlbumID(), albumList.get(position).getName());
                                             FragmentTransaction fr = getFragmentManager().beginTransaction();
                                             fr.replace(R.id.body_container, fragmentPhoto);
                                             fr.commit();
@@ -243,7 +243,7 @@ public class Fragment_Album extends Fragment {
             @Override
             public void onItemClick(int position) {
                 // Xử lý khi một item được click
-                Fragment_Album_Photo fragmentPhoto = Fragment_Album_Photo.newInstance(albumList.get(position).getAlbumID()); //fragment hien thi danh sach cac anh theo ten album
+                Fragment_Album_Photo fragmentPhoto = Fragment_Album_Photo.newInstance(albumList.get(position).getAlbumID(), albumList.get(position).getName()); //fragment hien thi danh sach cac anh theo ten album
                 FragmentTransaction fr = getFragmentManager().beginTransaction();
                 fr.replace(R.id.body_container, fragmentPhoto);
                 fr.commit();

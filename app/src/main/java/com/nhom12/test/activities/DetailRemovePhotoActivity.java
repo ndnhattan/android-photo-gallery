@@ -10,34 +10,46 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.media.ExifInterface;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.util.DisplayMetrics;
 import android.view.Gravity;
+import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.bumptech.glide.request.RequestOptions;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.google.android.material.bottomsheet.BottomSheetDialog;
+import com.nhom12.test.DataLocalManager;
 import com.nhom12.test.Fragment_Album;
+import com.nhom12.test.Fragment_Album_Choose;
 import com.nhom12.test.MainActivity;
 import com.nhom12.test.R;
 import com.nhom12.test.database.AlbumDbHelper;
 import com.nhom12.test.database.DatabaseSingleton;
 
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.sql.Date;
 import java.text.SimpleDateFormat;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
+import java.util.HashSet;
+import java.util.Set;
 
 public class DetailRemovePhotoActivity extends AppCompatActivity {
     ImageView detailImage;
@@ -60,6 +72,7 @@ public class DetailRemovePhotoActivity extends AppCompatActivity {
         String value = intent.getStringExtra("path");
         String imageDate = intent.getStringExtra("date");
         long imageId = intent.getLongExtra("id", 0); // dt
+        long albumId = intent.getLongExtra("albumId", 0); // dt
         Instant instant = Instant.ofEpochMilli(Long.parseLong(imageDate) * 1000);
         ZonedDateTime zonedDateTime = instant.atZone(ZoneId.systemDefault());
 
@@ -81,6 +94,39 @@ public class DetailRemovePhotoActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 onBackPressed();
+            }
+        });
+
+        mToolbar.setOnMenuItemClickListener(new Toolbar.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(MenuItem item) {
+                int key = item.getItemId();
+                if (key == R.id.move_to_album) {
+                    Fragment fragment = Fragment_Album_Choose.newInstance(imageId, albumId, true);
+                    getSupportFragmentManager().beginTransaction().replace(R.id.body_container_detail_remove, fragment).commit();
+                }
+                if (key == R.id.add_to_favor) {
+                    try {
+                        Set<String> imageListFavor = new HashSet<>();
+
+                        imageListFavor.add(value);
+
+                        DataLocalManager.setListImg(imageListFavor);
+                        Toast.makeText(getApplicationContext(), "Yêu thích ảnh thành công", Toast.LENGTH_LONG).show();
+                    } catch (Exception e) {
+                        e.printStackTrace();
+
+                        Toast.makeText(getApplicationContext(), "Error: " + e.getMessage(), Toast.LENGTH_LONG).show();
+                    }
+                } else if (key == R.id.btn_info) {
+                    File imageFile = new File(value);
+                    Uri targetUri = Uri.fromFile(imageFile);
+                    if (targetUri != null) {
+                        showInfo(targetUri, value);
+                    }
+                }
+
+                return true;
             }
         });
 
@@ -128,6 +174,10 @@ public class DetailRemovePhotoActivity extends AppCompatActivity {
         // Mở lại activity trước đó
         Intent intent = new Intent(DetailRemovePhotoActivity.this, MainActivity.class);
         startActivity(intent);
+    }
+
+    public void onBackPressed() {
+        finish(); // Kết thúc activity hiện tại
     }
 
     // Delete image from mediastore
@@ -192,6 +242,76 @@ public class DetailRemovePhotoActivity extends AppCompatActivity {
             int newHeight = (int) (originalBitmap.getHeight() * ((float) newWidth / originalBitmap.getWidth()));
             Bitmap resizedBitmap = Bitmap.createScaledBitmap(originalBitmap, newWidth, newHeight, true);
             return resizedBitmap;
+        }
+    }
+
+    private void showInfo(Uri imgUri, String value) {
+        if (imgUri != null) {
+
+            try {
+                ExifInterface exifInterface = new ExifInterface(value);
+                File file = new File(value);
+                String imgName = file.getName();
+
+                BottomSheetDialog infoBottomDialog = new BottomSheetDialog(this, R.style.BottomSheetDialogTheme);
+                View infoDialogView = LayoutInflater.from(getApplicationContext())
+                        .inflate(
+                                R.layout.layout_info,
+                                (LinearLayout) findViewById(R.id.infoContainer),
+                                false
+                        );
+                TextView txtInfoProducer = (TextView) infoDialogView.findViewById(R.id.txtInfoProducer);
+                TextView txtInfoReso = (TextView) infoDialogView.findViewById(R.id.txtInfoReso);
+                TextView txtInfoModel = (TextView) infoDialogView.findViewById(R.id.txtInfoModel);
+
+
+                TextView txtInfoTime = (TextView) infoDialogView.findViewById(R.id.txtInfoTime);
+                TextView txtInfoName = (TextView) infoDialogView.findViewById(R.id.txtInfoName);
+
+                txtInfoName.setText(imgName);
+                txtInfoProducer.setText(exifInterface.getAttribute(ExifInterface.TAG_MAKE));
+                //txtInfoSize.setText(exifInterface.getAttribute(ExifInterface.TAG_IMAGE_LENGTH) + "x" + exifInterface.getAttribute(ExifInterface.TAG_IMAGE_WIDTH));
+                String length = exifInterface.getAttribute(ExifInterface.TAG_IMAGE_LENGTH);
+                String width = exifInterface.getAttribute(ExifInterface.TAG_IMAGE_WIDTH);
+
+                int imageLength = Integer.parseInt(length);
+                int imageWidth = Integer.parseInt(width);
+
+                int resolution = imageLength * imageWidth;
+                double megapixels = (double) resolution / 1000000.0;
+
+                String megapixelsString = String.format("%.2f MP", megapixels);
+
+                txtInfoReso.setText(megapixelsString);
+
+                txtInfoModel.setText(exifInterface.getAttribute(ExifInterface.TAG_MODEL));
+
+                txtInfoTime.setText(exifInterface.getAttribute(ExifInterface.TAG_DATETIME));
+
+                infoBottomDialog.setContentView(infoDialogView);
+                infoBottomDialog.show();
+
+
+                //parcelFileDescriptor.close();
+
+
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+                Toast.makeText(getApplicationContext(),
+                        "Something wrong:\n" + e.toString(),
+                        Toast.LENGTH_LONG).show();
+            } catch (IOException e) {
+                e.printStackTrace();
+                Toast.makeText(getApplicationContext(),
+                        "Something wrong:\n" + e.toString(),
+                        Toast.LENGTH_LONG).show();
+            }
+
+
+        } else {
+            Toast.makeText(getApplicationContext(),
+                    "image Uri == null",
+                    Toast.LENGTH_LONG).show();
         }
     }
 

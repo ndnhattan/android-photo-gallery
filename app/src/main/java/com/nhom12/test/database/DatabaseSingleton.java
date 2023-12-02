@@ -1,6 +1,7 @@
 package com.nhom12.test.database;
 
 import android.content.Context;
+import android.widget.Toast;
 
 public class DatabaseSingleton {
     private static DatabaseSingleton instance;
