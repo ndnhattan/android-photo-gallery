@@ -15,6 +15,7 @@ import android.view.ViewGroup;
 import android.widget.Toast;
 
 import com.nhom12.test.activities.DetailPhotoActivity;
+import com.nhom12.test.activities.DetailRemovePhotoActivity;
 import com.nhom12.test.adapter.GridAlbumAdapter;
 import com.nhom12.test.adapter.SpaceItemDecoration;
 import com.nhom12.test.database.AlbumDbHelper;
@@ -34,13 +35,16 @@ public class Fragment_Album_Choose extends Fragment {
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
+    private static final String ARG_PARAM3 = "param3";
 
     // TODO: Rename and change types of parameters
     private long imageId;
     private long albumId;
+    boolean isDetailRemoveActivity = false;
 
     // Variable
     DetailPhotoActivity mainDetail;
+    DetailRemovePhotoActivity mainDetailRemove;
     ArrayList<Album> albumList = new ArrayList<>();
     AlbumDbHelper albumDbHelper;
     RecyclerView recyclerView;
@@ -57,11 +61,12 @@ public class Fragment_Album_Choose extends Fragment {
      * @return A new instance of fragment Fragment_Album_Choose.
      */
     // TODO: Rename and change types and number of parameters
-    public static Fragment_Album_Choose newInstance(long imageId, long albumId) {
+    public static Fragment_Album_Choose newInstance(long imageId, long albumId, boolean isDetailRemoveActivity) {
         Fragment_Album_Choose fragment = new Fragment_Album_Choose();
         Bundle args = new Bundle();
         args.putLong(ARG_PARAM1, imageId);
         args.putLong(ARG_PARAM2, albumId);
+        args.putBoolean(ARG_PARAM3, isDetailRemoveActivity);
         fragment.setArguments(args);
         return fragment;
     }
@@ -72,11 +77,18 @@ public class Fragment_Album_Choose extends Fragment {
         if (getArguments() != null) {
             imageId = getArguments().getLong(ARG_PARAM1);
             albumId = getArguments().getLong(ARG_PARAM2);
+            isDetailRemoveActivity = getArguments().getBoolean(ARG_PARAM3);
         }
         setHasOptionsMenu(true);
         try {
-            mainDetail = (DetailPhotoActivity) getActivity();
-            albumDbHelper = DatabaseSingleton.getInstance(mainDetail).getDbHelper();
+            if(isDetailRemoveActivity){
+                mainDetailRemove = (DetailRemovePhotoActivity)getActivity();
+                albumDbHelper = DatabaseSingleton.getInstance(mainDetailRemove).getDbHelper();
+
+            } else {
+                mainDetail = (DetailPhotoActivity) getActivity();
+                albumDbHelper = DatabaseSingleton.getInstance(mainDetail).getDbHelper();
+            }
         } catch (IllegalStateException e) {
             throw new IllegalStateException("MainActivity must implement callbacks");
         }
@@ -89,7 +101,11 @@ public class Fragment_Album_Choose extends Fragment {
         View rootView = inflater.inflate(R.layout.fragment__album__choose, container, false);
         loadAllALbum();
         recyclerView = (RecyclerView) rootView.findViewById(R.id.layout_grid_album);
-        adapter = new GridAlbumAdapter(mainDetail, albumList);
+        if(isDetailRemoveActivity){
+            adapter = new GridAlbumAdapter(mainDetailRemove, albumList);
+        } else {
+            adapter = new GridAlbumAdapter(mainDetail, albumList);
+        }
         recyclerView.setAdapter(adapter);
         recyclerView.setLayoutManager(new StaggeredGridLayoutManager(4, StaggeredGridLayoutManager.VERTICAL));
         recyclerView.addItemDecoration(new SpaceItemDecoration(12));
@@ -98,9 +114,22 @@ public class Fragment_Album_Choose extends Fragment {
             @Override
             public void onItemClick(int position) {
                 // Xử lý khi một item được click
+                System.out.println("id: " + imageId);
+                System.out.println("album current: " + albumId);
+                System.out.println("album new: " + albumList.get(position).getAlbumID());
+
                 albumDbHelper.moveImageToAlbum(imageId, albumId, albumList.get(position).getAlbumID());
-                Toast.makeText(mainDetail, "Move Successfull", Toast.LENGTH_SHORT).show();
-                mainDetail.onBackPressedExit();
+                long firstImageIDAlbumCurrent = albumDbHelper.findFirstImageIDAlbum(albumId);
+                long firstImageIDAlbumNew = albumDbHelper.findFirstImageIDAlbum(albumList.get(position).getAlbumID());
+                albumDbHelper.updateAlbumFirstImage(albumId,firstImageIDAlbumCurrent);
+                albumDbHelper.updateAlbumFirstImage(albumList.get(position).getAlbumID(), firstImageIDAlbumNew);
+                if(isDetailRemoveActivity){
+                    Toast.makeText(mainDetailRemove, "Move Successfull", Toast.LENGTH_SHORT).show();
+                    mainDetailRemove.onBackPressed();
+                } else {
+                    Toast.makeText(mainDetail, "Move Successfull", Toast.LENGTH_SHORT).show();
+                    mainDetail.onBackPressedExit();
+                }
             }
         });
 

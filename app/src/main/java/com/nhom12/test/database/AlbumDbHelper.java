@@ -39,6 +39,8 @@ public class AlbumDbHelper extends SQLiteOpenHelper {
 
     @Override
     public void onCreate(SQLiteDatabase db) {
+        Toast.makeText(context, "Tao Database", Toast.LENGTH_SHORT).show();
+
         // image_id theo mediastore
         String queryCreateImage =
                 "CREATE TABLE " + TABLE_IMAGES
@@ -264,10 +266,11 @@ public class AlbumDbHelper extends SQLiteOpenHelper {
         SQLiteDatabase db = this.getWritableDatabase();
 
         String selection = IMAGE_ID + " = ?";
+        String selection2 = AI_IMAGE_ID + " = ?";
         String[] selectionArgs = new String[]{String.valueOf(imageId)};
 
         db.delete(TABLE_IMAGES, selection, selectionArgs);
-        db.delete(TABLE_ALBUM_IMAGE, selection, selectionArgs);
+        db.delete(TABLE_ALBUM_IMAGE, selection2, selectionArgs);
     }
 
     public Cursor getImageById(long imageId) {
@@ -297,6 +300,25 @@ public class AlbumDbHelper extends SQLiteOpenHelper {
         }
 
         return -1; // Trả về -1 nếu không tìm thấy album_id cho image_id
+    }
+
+    public long findFirstImageIDAlbum(long albumId) {
+        SQLiteDatabase db = getReadableDatabase();
+
+        String query = "SELECT " + TABLE_IMAGES + "." + IMAGE_ID +
+                " FROM " + TABLE_ALBUM_IMAGE +
+                " JOIN " + TABLE_IMAGES + " ON " + TABLE_ALBUM_IMAGE + "." + AI_IMAGE_ID + " = " + TABLE_IMAGES + "." + IMAGE_ID +
+                " WHERE " + TABLE_ALBUM_IMAGE + "." + AI_ALBUM_ID + " = " + albumId +
+                " ORDER BY " + TABLE_IMAGES + "." + IMAGE_DATE + " DESC LIMIT 1";
+
+        Cursor cursor = db.rawQuery(query, null);
+
+        int firstImageIdAlbum = -1;
+        if (cursor.moveToFirst()) {
+            firstImageIdAlbum = cursor.getInt(cursor.getColumnIndex(IMAGE_ID));
+        }
+
+        return firstImageIdAlbum;
     }
 
 

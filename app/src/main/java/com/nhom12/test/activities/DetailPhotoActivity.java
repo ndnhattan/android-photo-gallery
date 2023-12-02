@@ -126,7 +126,7 @@ public class DetailPhotoActivity extends AppCompatActivity{
             int id = item.getItemId();
 
             if (id == R.id.move_to_album) {
-                Fragment fragment = Fragment_Album_Choose.newInstance(imageId, albumId);
+                Fragment fragment = Fragment_Album_Choose.newInstance(imageId, albumId, false);
                 getSupportFragmentManager().beginTransaction().replace(R.id.body_container_detail, fragment).commit();
                 return true;
             } else
@@ -151,7 +151,7 @@ public class DetailPhotoActivity extends AppCompatActivity{
             public boolean onMenuItemClick(MenuItem item) {
                 int key = item.getItemId();
                 if (key == R.id.move_to_album) {
-                    Fragment fragment = Fragment_Album_Choose.newInstance(imageId, albumId);
+                    Fragment fragment = Fragment_Album_Choose.newInstance(imageId, albumId, false);
                     getSupportFragmentManager().beginTransaction().replace(R.id.body_container_detail, fragment).commit();
                 }
                 if (key == R.id.add_to_favor) {
@@ -325,6 +325,8 @@ public class DetailPhotoActivity extends AppCompatActivity{
             @Override
             public void onClick(View view) {
                 albumDbHelper.moveImageToAlbum(imageId, albumId,2); // 2 la id mac dinh cua album remove
+                long firstImageIDAlbumCurrent = albumDbHelper.findFirstImageIDAlbum(albumId);
+                albumDbHelper.updateAlbumFirstImage(albumId,firstImageIDAlbumCurrent);
                 dialog.dismiss();
                 finish();
 
