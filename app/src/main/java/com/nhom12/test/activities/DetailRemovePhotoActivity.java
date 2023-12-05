@@ -102,8 +102,10 @@ public class DetailRemovePhotoActivity extends AppCompatActivity {
             public boolean onMenuItemClick(MenuItem item) {
                 int key = item.getItemId();
                 if (key == R.id.move_to_album) {
-                    Fragment fragment = Fragment_Album_Choose.newInstance(imageId, albumId, true);
+                    Fragment fragment = Fragment_Album_Choose.newInstance(imageId, albumId, true, true);
                     getSupportFragmentManager().beginTransaction().replace(R.id.body_container_detail_remove, fragment).commit();
+                } else if (key == R.id.copy_to_album) {
+                    Toast.makeText(DetailRemovePhotoActivity.this, "No Allow Copy", Toast.LENGTH_SHORT).show();
                 }
                 if (key == R.id.add_to_favor) {
                     try {

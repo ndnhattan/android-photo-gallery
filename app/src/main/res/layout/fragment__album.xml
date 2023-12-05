@@ -8,21 +8,6 @@
     tools:context=".Fragment_Album"
     >
 
-    <androidx.appcompat.widget.Toolbar
-        android:id="@+id/toolbar_album"
-        app:title="Album"
-        app:titleMarginStart="25dp"
-
-        app:titleTextColor="#FFFFFF"
-        android:background="@color/light_blue"
-
-        android:layout_width="match_parent"
-        android:layout_height="?attr/actionBarSize"
-        app:menu="@menu/menu_toolbar_album"
-        >
-
-    </androidx.appcompat.widget.Toolbar>
-
     <!-- TODO: Update blank fragment layout -->
 
 <!--    <GridView-->
@@ -35,6 +20,20 @@
 <!--        android:verticalSpacing="5dip"-->
 
 <!--        />-->
+
+    <androidx.appcompat.widget.Toolbar
+        android:id="@+id/toolbar_album"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+
+        android:background="@color/light_blue"
+        app:menu="@menu/menu_toolbar_album"
+
+        app:title="Album"
+        app:titleMarginStart="25dp"
+        app:titleTextColor="#FFFFFF">
+
+    </androidx.appcompat.widget.Toolbar>
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/layout_grid_album"

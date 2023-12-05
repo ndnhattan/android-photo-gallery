@@ -7,8 +7,11 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.Filter;
+import android.widget.Filterable;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
@@ -24,9 +27,10 @@ import java.util.ArrayList;
 import com.nhom12.test.R;
 
 import java.util.ArrayList;
-public class GridAlbumAdapter extends RecyclerView.Adapter<GridAlbumAdapter.ViewHolder> {
+public class GridAlbumAdapter extends RecyclerView.Adapter<GridAlbumAdapter.ViewHolder> implements Filterable {
     Context context;
     ArrayList<Album> albumList;
+    ArrayList<Album> albumListTemp;
     private OnItemClickListener onItemClickListener;
     public void setOnItemClickListener(OnItemClickListener listener) {
         this.onItemClickListener = listener;
@@ -35,6 +39,7 @@ public class GridAlbumAdapter extends RecyclerView.Adapter<GridAlbumAdapter.View
     public GridAlbumAdapter(Context context, ArrayList<Album> albumList) {
         this.context = context;
         this.albumList = albumList;
+        this.albumListTemp = albumList;
     }
 
     @NonNull
@@ -79,7 +84,7 @@ public class GridAlbumAdapter extends RecyclerView.Adapter<GridAlbumAdapter.View
             @Override
             public void onClick(View view) {
                 if (onItemClickListener != null) {
-                    onItemClickListener.onItemClick(position);
+                    onItemClickListener.onItemClick(albumList.get(position));
                 }
             }
         });
@@ -99,6 +104,37 @@ public class GridAlbumAdapter extends RecyclerView.Adapter<GridAlbumAdapter.View
             textView = itemView.findViewById(R.id.textAlbum);
             imageView = itemView.findViewById(R.id.buttonAll);
         }
+    }
+    @Override
+    public Filter getFilter() {
+        return new Filter() {
+            @Override
+            protected FilterResults performFiltering(CharSequence charSequence) {
+                String keyWord = charSequence.toString();
+                if(keyWord.isEmpty()){
+                    albumList = albumListTemp;
+                } else {
+                    ArrayList<Album> albums = new ArrayList<>();
+                    for(Album album : albumListTemp){
+                        if(album.getName().toLowerCase().contains(keyWord.toLowerCase())){
+                            albums.add(album);
+                        }
+                    }
+                    albumList = albums;
+                }
+                System.out.println(albumList.size());
 
+                FilterResults filterResults = new FilterResults();
+                filterResults.values = albumList;
+                return filterResults;
 
-    }}
+            }
+
+            @Override
+            protected void publishResults(CharSequence charSequence, FilterResults filterResults) {
+                albumList = (ArrayList<Album>) filterResults.values;
+                notifyDataSetChanged();
+            }
+        };
+    }
+}
