@@ -2,15 +2,11 @@ package com.nhom12.test.adapter;
 
 import android.content.Context;
 import android.database.Cursor;
-import android.provider.MediaStore;
-import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.recyclerview.widget.StaggeredGridLayoutManager;
@@ -21,15 +17,13 @@ import java.sql.Date;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 
-public class ListImageAdapter extends RecyclerView.Adapter<ListImageAdapter.ViewHolder> {
+public class ListImageSelectAdapter extends RecyclerView.Adapter<ListImageSelectAdapter.ViewHolder> {
     private ArrayList<Cursor> rs;
     private Context context;
-    Fragment fragment;
 
-    public ListImageAdapter(Context context, ArrayList<Cursor> rs, Fragment fragment) {
+    public ListImageSelectAdapter(Context context, ArrayList<Cursor> rs) {
         this.context = context;
         this.rs = rs;
-        this.fragment = fragment;
     }
 
     public void setData(ArrayList<Cursor> rs) {
@@ -38,18 +32,18 @@ public class ListImageAdapter extends RecyclerView.Adapter<ListImageAdapter.View
     }
 
     @Override
-    public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+    public ListImageSelectAdapter.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         Context context = parent.getContext();
         LayoutInflater inflater = LayoutInflater.from(context);
 
         View view = inflater.inflate(R.layout.item_list_image, parent, false);
 
-        ViewHolder viewHolder = new ViewHolder(view);
+        ListImageSelectAdapter.ViewHolder viewHolder = new ListImageSelectAdapter.ViewHolder(view);
         return viewHolder;
     }
 
     @Override
-    public void onBindViewHolder(ViewHolder holder, int position) {
+    public void onBindViewHolder(ListImageSelectAdapter.ViewHolder holder, int position) {
         Cursor result = rs.get(position);
 
         result.moveToFirst();
@@ -61,9 +55,9 @@ public class ListImageAdapter extends RecyclerView.Adapter<ListImageAdapter.View
         int day = date.getDate();
 
         holder.textView.setText(String.valueOf(day) + " tháng " + String.valueOf(month + 1) + ", năm " + String.valueOf(year + 1900));
-        holder.recyclerView.setAdapter(new GridImageAdapter(context, result, position, fragment));
+        holder.recyclerView.setAdapter(new GridImageSelectAdapter(context, result, position));
         holder.recyclerView.setLayoutManager(new StaggeredGridLayoutManager(4, StaggeredGridLayoutManager.VERTICAL));
-        holder.recyclerView.addItemDecoration(new SpaceItemDecoration(12));
+        //holder.recyclerView.addItemDecoration(new SpaceItemDecoration(12));
     }
 
     @Override
