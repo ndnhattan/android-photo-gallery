@@ -8,4 +8,7 @@
         android:icon="@drawable/ic_edit"></item>
     <item android:id="@+id/menu_detail_share" android:title="Share"
         android:icon="@drawable/ic_share"></item>
+    <item android:id="@+id/menu_detail_more" android:title="More"
+        android:icon="@drawable/ic_more">
+    </item>
 </menu>

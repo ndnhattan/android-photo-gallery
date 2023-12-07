@@ -8,32 +8,39 @@
     tools:context=".Fragment_Album"
     >
 
+    <!-- TODO: Update blank fragment layout -->
+
+<!--    <GridView-->
+<!--        android:id="@+id/layout_grid_album"-->
+<!--        android:layout_width="match_parent"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        android:columnWidth="100dip"-->
+<!--        android:horizontalSpacing="5dip"-->
+<!--        android:numColumns="auto_fit"-->
+<!--        android:verticalSpacing="5dip"-->
+
+<!--        />-->
+
     <androidx.appcompat.widget.Toolbar
         android:id="@+id/toolbar_album"
-        app:title="Album"
-        app:titleMarginStart="25dp"
-
-        app:titleTextColor="#FFFFFF"
-        android:background="@color/light_blue"
-
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
+
+        android:background="@color/light_blue"
         app:menu="@menu/menu_toolbar_album"
-        >
+
+        app:title="Album"
+        app:titleMarginStart="25dp"
+        app:titleTextColor="#FFFFFF">
 
     </androidx.appcompat.widget.Toolbar>
 
-    <!-- TODO: Update blank fragment layout -->
-
-    <GridView
+    <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/layout_grid_album"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:verticalSpacing="5dip"
-        android:horizontalSpacing="5dip"
-        android:numColumns="auto_fit"
-        android:columnWidth="100dip"
-
-        />
+        android:background="@android:color/white"
+        android:clipToPadding="false"
+        android:scrollbars="vertical" />
 
 </LinearLayout>

@@ -5,14 +5,14 @@ import android.database.Cursor;
 import android.provider.MediaStore;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-<<<<<<< Updated upstream
-=======
 import androidx.fragment.app.Fragment;
->>>>>>> Stashed changes
+import androidx.annotation.NonNull;
+import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.recyclerview.widget.StaggeredGridLayoutManager;
 
@@ -25,19 +25,17 @@ import java.util.ArrayList;
 public class ListImageAdapter extends RecyclerView.Adapter<ListImageAdapter.ViewHolder> {
     private ArrayList<Cursor> rs;
     private Context context;
+    Fragment fragment;
 
-    public ListImageAdapter(Context context, ArrayList<Cursor> rs) {
+    public ListImageAdapter(Context context, ArrayList<Cursor> rs, Fragment fragment) {
         this.context = context;
         this.rs = rs;
-<<<<<<< Updated upstream
-=======
         this.fragment = fragment;
     }
 
-    public void setData(ArrayList<Cursor> rs){
+    public void setData(ArrayList<Cursor> rs) {
         this.rs = rs;
         notifyDataSetChanged();
->>>>>>> Stashed changes
     }
 
     @Override
@@ -56,8 +54,7 @@ public class ListImageAdapter extends RecyclerView.Adapter<ListImageAdapter.View
         Cursor result = rs.get(position);
 
         result.moveToFirst();
-        int dateColumnIndex = result.getColumnIndex(MediaStore.Images.Media.DATE_ADDED);
-        String imageDate = result.getString(dateColumnIndex);
+        String imageDate = result.getString(2);
         Timestamp tms = new Timestamp(Long.parseLong(imageDate) * 1000);
         Date date = new Date(tms.getTime());
         int year = date.getYear();
@@ -65,11 +62,9 @@ public class ListImageAdapter extends RecyclerView.Adapter<ListImageAdapter.View
         int day = date.getDate();
 
         holder.textView.setText(String.valueOf(day) +" tháng " + String.valueOf(month + 1) + ", năm " + String.valueOf(year + 1900));
-<<<<<<< Updated upstream
-        holder.recyclerView.setAdapter(new GridImageAdapter(context, result));
-=======
         holder.recyclerView.setAdapter(new GridImageAdapter(context, result, position, fragment));
->>>>>>> Stashed changes
+        holder.textView.setText(String.valueOf(day) + " tháng " + String.valueOf(month + 1) + ", năm " + String.valueOf(year + 1900));
+        holder.recyclerView.setAdapter(new GridImageAdapter(context, result, position, fragment));
         holder.recyclerView.setLayoutManager(new StaggeredGridLayoutManager(4, StaggeredGridLayoutManager.VERTICAL));
         holder.recyclerView.addItemDecoration(new SpaceItemDecoration(12));
     }

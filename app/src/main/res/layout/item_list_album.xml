@@ -2,30 +2,34 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
-    android:orientation="vertical">
+    android:orientation="vertical"
+    android:layout_marginTop="12dp"
+    >
 
     <ImageView
         android:id="@+id/buttonAll"
         android:layout_width="80dp"
         android:layout_height="80dp"
-        android:layout_gravity="left"
-        android:layout_marginTop="20dp"
-        android:layout_marginRight="16dp"
-        android:layout_marginLeft="16dp"
-        android:src="@drawable/icon_all_album"
-        android:scaleType="centerInside">
+        android:layout_gravity="center"
+        android:paddingLeft="4dp"
+        android:paddingRight="4dp"
+        android:scaleType="centerInside"
+        android:background="@drawable/view_corner"
+        >
 
     </ImageView>
 
     <TextView
         android:id="@+id/textAlbum"
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
         android:gravity="center"
+        android:layout_gravity="center"
         android:layout_height="wrap_content"
+        android:background="@color/white"
         android:text="Picture Camera"
         android:textSize="16sp"
-        android:textStyle="bold"
         android:layout_marginTop="6dp"
+        android:textColor="@color/black"
         />
 
 

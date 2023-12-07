@@ -66,6 +66,7 @@ public class DetailRemovePhotoActivity extends AppCompatActivity {
     AlbumDbHelper albumDbHelper;
     FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
     boolean isFavorite = false;
+  
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -129,6 +130,18 @@ public class DetailRemovePhotoActivity extends AppCompatActivity {
                     Intent intent = new Intent();
                     intent.putExtra("isUpdate", true);
                     setResult(RESULT_OK, intent);
+                    try {
+                        Set<String> imageListFavor = new HashSet<>();
+
+                        imageListFavor.add(value);
+
+                        DataLocalManager.setListImg(imageListFavor);
+                        Toast.makeText(getApplicationContext(), "Yêu thích ảnh thành công", Toast.LENGTH_LONG).show();
+                    } catch (Exception e) {
+                        e.printStackTrace();
+
+                        Toast.makeText(getApplicationContext(), "Error: " + e.getMessage(), Toast.LENGTH_LONG).show();
+                    }
                 } else if (key == R.id.btn_info) {
                     File imageFile = new File(value);
                     Uri targetUri = Uri.fromFile(imageFile);

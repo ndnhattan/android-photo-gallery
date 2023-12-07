@@ -6,7 +6,9 @@
         android:icon="@drawable/icon_add"
         app:showAsAction="always"></item>
     <item android:title="Search"
-        android:id="@+id/search"
+        android:id="@+id/search_album"
         android:icon="@drawable/icon_search"
-        app:showAsAction="always"></item>
+        app:showAsAction="always"
+        app:actionViewClass="androidx.appcompat.widget.SearchView"
+        ></item>
 </menu>

@@ -10,6 +10,8 @@ import java.util.Set;
 
 public class DataLocalManager {
     private static final String PREF_IMG_FAVOR="PREF_IMG_FAVOR";
+private static final String PREF_FIRST_INSTALL = "PREF_FIRST_INSTALL";
+    private static final String PREF_STRING = "PREF_STRING";
     private static DataLocalManager instance;
     private MySharedPreferences mySharedPreferences;
 
