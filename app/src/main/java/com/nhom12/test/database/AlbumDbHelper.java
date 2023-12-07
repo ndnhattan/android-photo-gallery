@@ -123,6 +123,20 @@ public class AlbumDbHelper extends SQLiteOpenHelper {
         return isExists;
     }
 
+    public boolean checkAlbumImageExistsFull(long albumId ,long imageId){
+        SQLiteDatabase db = this.getReadableDatabase();
+        String query = "SELECT * FROM " + TABLE_ALBUM_IMAGE +
+                " WHERE " + AI_ALBUM_ID + " = ? AND " + AI_IMAGE_ID + " = ?"; // Lay ca 2 truong
+//                " WHERE " + AI_IMAGE_ID + " = ? ";
+        String[] selectionArgs = {String.valueOf(albumId),String.valueOf(imageId)};
+        Cursor cursor = null;
+        cursor = db.rawQuery(query, selectionArgs);
+
+        boolean isExists = cursor.getCount() > 0;
+        cursor.close();
+        return isExists;
+    }
+
     public void addAlbum(String albumName, long albumFirstImageID){
         if(!checkAlbumExists(albumName)){
             SQLiteDatabase db = this.getWritableDatabase();
@@ -245,7 +259,20 @@ public class AlbumDbHelper extends SQLiteOpenHelper {
 
         String selections = AI_IMAGE_ID + " = ? AND " + AI_ALBUM_ID + " = ?";
         String[] selectionArgs = new String[]{String.valueOf(imageID), String.valueOf(albumIDCurrent)};
+//        if(!checkAlbumImageExistsFull(albumID, imageID)){
+//            db.update(TABLE_ALBUM_IMAGE, cv, selections, selectionArgs);
+//        }
         db.update(TABLE_ALBUM_IMAGE, cv, selections, selectionArgs);
+    }
+
+    public void copyImageToAlbum(long imageID, long newAlbumID){
+        if(!checkAlbumImageExistsFull(newAlbumID, imageID)){
+            SQLiteDatabase db = this.getWritableDatabase();
+            ContentValues cv = new ContentValues();
+            cv.put(AI_ALBUM_ID, newAlbumID);
+            cv.put(AI_IMAGE_ID, imageID);
+            long result = db.insert(TABLE_ALBUM_IMAGE, null, cv);
+        }
     }
 
     public void updateAlbumFirstImage(long albumID, long imageFirstImageID) {
@@ -304,6 +331,8 @@ public class AlbumDbHelper extends SQLiteOpenHelper {
 
     public Cursor readAllImages(){
         String query = "SELECT * FROM " + TABLE_IMAGES +
+                " WHERE " + IMAGE_ID + " NOT IN (" +
+                " SELECT " + AI_IMAGE_ID + " FROM " + TABLE_ALBUM_IMAGE + " WHERE " + AI_ALBUM_ID + " = 2 )" +
         " ORDER BY " + IMAGE_DATE + " DESC";
         SQLiteDatabase db = this.getReadableDatabase();
 
@@ -320,6 +349,8 @@ public class AlbumDbHelper extends SQLiteOpenHelper {
                 " FROM " + TABLE_IMAGES +
                 " WHERE " + TABLE_IMAGES + "." + IMAGE_DATE + " >= ?" +
                 " AND " + TABLE_IMAGES + "." + IMAGE_DATE + " < ?" +
+                " AND " + IMAGE_ID + " NOT IN (" +
+                " SELECT " + AI_IMAGE_ID + " FROM " + TABLE_ALBUM_IMAGE + " WHERE " + AI_ALBUM_ID + " = 2 )" +
                 " ORDER BY " + IMAGE_DATE + " DESC";
 
         Cursor cursor = null;

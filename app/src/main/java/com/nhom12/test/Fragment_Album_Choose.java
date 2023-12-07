@@ -36,11 +36,13 @@ public class Fragment_Album_Choose extends Fragment {
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
     private static final String ARG_PARAM3 = "param3";
+    private static final String ARG_PARAM4 = "param4";
 
     // TODO: Rename and change types of parameters
     private long imageId;
     private long albumId;
     boolean isDetailRemoveActivity = false;
+    boolean isMove = false;
 
     // Variable
     DetailPhotoActivity mainDetail;
@@ -61,12 +63,13 @@ public class Fragment_Album_Choose extends Fragment {
      * @return A new instance of fragment Fragment_Album_Choose.
      */
     // TODO: Rename and change types and number of parameters
-    public static Fragment_Album_Choose newInstance(long imageId, long albumId, boolean isDetailRemoveActivity) {
+    public static Fragment_Album_Choose newInstance(long imageId, long albumId, boolean isDetailRemoveActivity, boolean isMove) {
         Fragment_Album_Choose fragment = new Fragment_Album_Choose();
         Bundle args = new Bundle();
         args.putLong(ARG_PARAM1, imageId);
         args.putLong(ARG_PARAM2, albumId);
         args.putBoolean(ARG_PARAM3, isDetailRemoveActivity);
+        args.putBoolean(ARG_PARAM4, isMove);
         fragment.setArguments(args);
         return fragment;
     }
@@ -78,6 +81,7 @@ public class Fragment_Album_Choose extends Fragment {
             imageId = getArguments().getLong(ARG_PARAM1);
             albumId = getArguments().getLong(ARG_PARAM2);
             isDetailRemoveActivity = getArguments().getBoolean(ARG_PARAM3);
+            isMove = getArguments().getBoolean(ARG_PARAM4);
         }
         setHasOptionsMenu(true);
         try {
@@ -112,23 +116,28 @@ public class Fragment_Album_Choose extends Fragment {
 
         adapter.setOnItemClickListener(new OnItemClickListener() {
             @Override
-            public void onItemClick(int position) {
+            public void onItemClick(Album album) {
                 // Xử lý khi một item được click
-                System.out.println("id: " + imageId);
-                System.out.println("album current: " + albumId);
-                System.out.println("album new: " + albumList.get(position).getAlbumID());
 
-                albumDbHelper.moveImageToAlbum(imageId, albumId, albumList.get(position).getAlbumID());
-                long firstImageIDAlbumCurrent = albumDbHelper.findFirstImageIDAlbum(albumId);
-                long firstImageIDAlbumNew = albumDbHelper.findFirstImageIDAlbum(albumList.get(position).getAlbumID());
-                albumDbHelper.updateAlbumFirstImage(albumId,firstImageIDAlbumCurrent);
-                albumDbHelper.updateAlbumFirstImage(albumList.get(position).getAlbumID(), firstImageIDAlbumNew);
-                if(isDetailRemoveActivity){
-                    Toast.makeText(mainDetailRemove, "Move Successfull", Toast.LENGTH_SHORT).show();
-                    mainDetailRemove.onBackPressed();
+                if(isMove){
+                    albumDbHelper.moveImageToAlbum(imageId, albumId, album.getAlbumID());
+                    long firstImageIDAlbumCurrent = albumDbHelper.findFirstImageIDAlbum(albumId);
+                    long firstImageIDAlbumNew = albumDbHelper.findFirstImageIDAlbum(album.getAlbumID());
+                    albumDbHelper.updateAlbumFirstImage(albumId,firstImageIDAlbumCurrent);
+                    albumDbHelper.updateAlbumFirstImage(album.getAlbumID(), firstImageIDAlbumNew);
                 } else {
-                    Toast.makeText(mainDetail, "Move Successfull", Toast.LENGTH_SHORT).show();
-                    mainDetail.onBackPressedExit();
+                    albumDbHelper.copyImageToAlbum(imageId, album.getAlbumID());
+                    long firstImageIDAlbumNew = albumDbHelper.findFirstImageIDAlbum(album.getAlbumID());
+                    albumDbHelper.updateAlbumFirstImage(album.getAlbumID(), firstImageIDAlbumNew);
+                }
+
+                if(isDetailRemoveActivity){
+                    Toast.makeText(mainDetailRemove, "Restore Successfull", Toast.LENGTH_SHORT).show();
+                    requireActivity().getSupportFragmentManager().popBackStack();
+                } else {
+                    Toast.makeText(mainDetail, "Successfull", Toast.LENGTH_SHORT).show();
+                    requireActivity().getSupportFragmentManager().popBackStack();
+//                    mainDetail.onBackPressedExit();
                 }
             }
         });

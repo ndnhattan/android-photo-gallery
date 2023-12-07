@@ -18,6 +18,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.Nullable;
 import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -44,6 +45,7 @@ public class Fragment_Photo extends Fragment {
     public static Cursor result;
     public static ArrayList<Integer> indexArr = new ArrayList<>();
     public static int index;
+    ListImageAdapter listImageAdapter;
 
     public static Fragment_Photo newInstance(String strArg) {
         Fragment_Photo fragment = new Fragment_Photo();
@@ -62,6 +64,20 @@ public class Fragment_Photo extends Fragment {
             albumDbHelper = DatabaseSingleton.getInstance(main).getDbHelper();
         } catch (IllegalStateException e) {
             throw new IllegalStateException("MainActivity must implement callbacks");
+        }
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (resultCode == main.RESULT_OK) {
+            boolean isUpdate = data.getBooleanExtra("isUpdate", false);
+            if(isUpdate){
+                Toast.makeText(main, "Refresh", Toast.LENGTH_SHORT).show();
+                rs.clear();
+                loadImages();
+                listImageAdapter.setData(rs);
+            }
         }
     }
 
@@ -164,7 +180,9 @@ public class Fragment_Photo extends Fragment {
         recyclerView = (RecyclerView) rootView.findViewById(R.id.recyclerView);
         listImages();
         loadImages();
-        recyclerView.setAdapter(new ListImageAdapter(main, rs));
+        listImageAdapter = new ListImageAdapter(main, rs, this);
+        recyclerView.setAdapter(listImageAdapter);
+//        recyclerView.setAdapter(new ListImageAdapter(main, rs, this));
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(main);
         recyclerView.setLayoutManager(linearLayoutManager);
 

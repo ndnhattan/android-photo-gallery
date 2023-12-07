@@ -6,6 +6,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
@@ -95,6 +97,7 @@ public class DetailPhotoActivity extends AppCompatActivity{
     //new
     private List<String> listFavorImgPath;
     private int pos;
+    FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
 
     @Override
     protected void onCreate(Bundle savedInstanceState){
@@ -126,7 +129,7 @@ public class DetailPhotoActivity extends AppCompatActivity{
             int id = item.getItemId();
 
             if (id == R.id.move_to_album) {
-                Fragment fragment = Fragment_Album_Choose.newInstance(imageId, albumId, false);
+                Fragment fragment = Fragment_Album_Choose.newInstance(imageId, albumId, false, true);
                 getSupportFragmentManager().beginTransaction().replace(R.id.body_container_detail, fragment).commit();
                 return true;
             } else
@@ -151,8 +154,13 @@ public class DetailPhotoActivity extends AppCompatActivity{
             public boolean onMenuItemClick(MenuItem item) {
                 int key = item.getItemId();
                 if (key == R.id.move_to_album) {
-                    Fragment fragment = Fragment_Album_Choose.newInstance(imageId, albumId, false);
-                    getSupportFragmentManager().beginTransaction().replace(R.id.body_container_detail, fragment).commit();
+                    Fragment fragment = Fragment_Album_Choose.newInstance(imageId, albumId, false, true);
+                    ft.replace(R.id.body_container_detail, fragment).addToBackStack("ft_album_move");
+                    ft.commit();
+                } else if (key == R.id.copy_to_album){
+                    Fragment fragment = Fragment_Album_Choose.newInstance(imageId, albumId, false, false);
+                    ft.replace(R.id.body_container_detail, fragment).addToBackStack("ft_album_copy");
+                    ft.commit();
                 }
                 if (key == R.id.add_to_favor) {
                     try {
@@ -316,6 +324,8 @@ public class DetailPhotoActivity extends AppCompatActivity{
         WindowManager.LayoutParams windowAttributes = window.getAttributes();
         windowAttributes.gravity = Gravity.CENTER;
         window.setAttributes(windowAttributes);
+        window.setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+
 
         dialog.setCancelable(true);
         Button btnSubmit = dialog.findViewById(R.id.btnSubmit_check);
@@ -328,6 +338,10 @@ public class DetailPhotoActivity extends AppCompatActivity{
                 long firstImageIDAlbumCurrent = albumDbHelper.findFirstImageIDAlbum(albumId);
                 albumDbHelper.updateAlbumFirstImage(albumId,firstImageIDAlbumCurrent);
                 dialog.dismiss();
+
+                Intent intent = new Intent();
+                intent.putExtra("isUpdate", true);
+                setResult(RESULT_OK, intent);
                 finish();
 
             }
@@ -340,10 +354,6 @@ public class DetailPhotoActivity extends AppCompatActivity{
             }
         });
         dialog.show();
-    }
-
-    public void onBackPressedExit() {
-        finish(); // Kết thúc activity hiện tại
     }
 
     private void showInfo(Uri imgUri, String value) {

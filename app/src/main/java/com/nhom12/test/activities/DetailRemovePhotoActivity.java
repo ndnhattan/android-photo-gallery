@@ -3,6 +3,7 @@ package com.nhom12.test.activities;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentTransaction;
 
 import android.app.Dialog;
 import android.content.ContentUris;
@@ -10,6 +11,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.media.ExifInterface;
 import android.net.Uri;
 import android.os.Bundle;
@@ -35,10 +38,13 @@ import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.nhom12.test.DataLocalManager;
 import com.nhom12.test.Fragment_Album;
 import com.nhom12.test.Fragment_Album_Choose;
+import com.nhom12.test.Fragment_Album_Photo;
+import com.nhom12.test.Fragment_Photo;
 import com.nhom12.test.MainActivity;
 import com.nhom12.test.R;
 import com.nhom12.test.database.AlbumDbHelper;
 import com.nhom12.test.database.DatabaseSingleton;
+import com.nhom12.test.utils.OnSwipeTouchListener;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -58,6 +64,8 @@ public class DetailRemovePhotoActivity extends AppCompatActivity {
     boolean flag = true;
     BottomNavigationView navigation;
     AlbumDbHelper albumDbHelper;
+    FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+
 
 
     @Override
@@ -102,8 +110,11 @@ public class DetailRemovePhotoActivity extends AppCompatActivity {
             public boolean onMenuItemClick(MenuItem item) {
                 int key = item.getItemId();
                 if (key == R.id.move_to_album) {
-                    Fragment fragment = Fragment_Album_Choose.newInstance(imageId, albumId, true);
-                    getSupportFragmentManager().beginTransaction().replace(R.id.body_container_detail_remove, fragment).commit();
+                    Fragment fragment = Fragment_Album_Choose.newInstance(imageId, albumId, true, true);
+                    ft.replace(R.id.body_container_detail_remove, fragment).addToBackStack("ft_album_move");
+                    ft.commit();
+                } else if (key == R.id.copy_to_album) {
+                    Toast.makeText(DetailRemovePhotoActivity.this, "No Allow Copy", Toast.LENGTH_SHORT).show();
                 }
                 if (key == R.id.add_to_favor) {
                     try {
@@ -133,6 +144,67 @@ public class DetailRemovePhotoActivity extends AppCompatActivity {
         detailImage = (ImageView) findViewById(R.id.detailImageView);
         Bitmap bitmap = resizeImage(value);
         detailImage.setImageBitmap(bitmap);
+
+        detailImage.setOnTouchListener(new OnSwipeTouchListener(this) {
+
+
+            public void onClickUp() {
+                if (flag) {
+                    mToolbar.setVisibility(View.INVISIBLE);
+                    navigation.setVisibility(View.INVISIBLE);
+                    flag = false;
+                } else {
+                    mToolbar.setVisibility(View.VISIBLE);
+                    navigation.setVisibility(View.VISIBLE);
+                    flag = true;
+                }
+            }
+            public void onSwipeRight() {
+                if (Fragment_Photo.index > 0) {
+                    Fragment_Photo.index = Fragment_Photo.index - 1;
+                    Fragment_Photo.result.moveToPosition(Fragment_Photo.index);
+                    String path = Fragment_Photo.result.getString(1);
+                    String imageDate = Fragment_Photo.result.getString(2);
+
+                    Instant instant = Instant.ofEpochMilli(Long.parseLong(imageDate) * 1000);
+                    ZonedDateTime zonedDateTime = instant.atZone(ZoneId.systemDefault());
+                    int year = zonedDateTime.getYear();
+                    int month = zonedDateTime.getMonthValue();
+                    int day = zonedDateTime.getDayOfMonth();
+                    Date date = new Date(Long.parseLong(imageDate) * 1000);
+                    SimpleDateFormat dateFormat = new SimpleDateFormat("HH:mm");
+                    String formattedTime = dateFormat.format(date);
+
+                    txtDate.setText(String.valueOf(day) + " tháng " + String.valueOf(month) + ", năm " + String.valueOf(year));
+                    txtTime.setText(formattedTime);
+                    Bitmap bitmap = resizeImage(path);
+                    detailImage.setImageBitmap(bitmap);
+                }
+            }
+
+            public void onSwipeLeft() {
+                if (Fragment_Photo.index < Fragment_Photo.result.getCount() - 1) {
+                    Fragment_Photo.index = Fragment_Photo.index + 1;
+                    Fragment_Photo.result.moveToPosition(Fragment_Photo.index);
+                    String path = Fragment_Photo.result.getString(1);
+                    String imageDate = Fragment_Photo.result.getString(2);
+
+                    Instant instant = Instant.ofEpochMilli(Long.parseLong(imageDate) * 1000);
+                    ZonedDateTime zonedDateTime = instant.atZone(ZoneId.systemDefault());
+                    int year = zonedDateTime.getYear();
+                    int month = zonedDateTime.getMonthValue();
+                    int day = zonedDateTime.getDayOfMonth();
+                    Date date = new Date(Long.parseLong(imageDate) * 1000);
+                    SimpleDateFormat dateFormat = new SimpleDateFormat("HH:mm");
+                    String formattedTime = dateFormat.format(date);
+
+                    txtDate.setText(String.valueOf(day) + " tháng " + String.valueOf(month) + ", năm " + String.valueOf(year));
+                    txtTime.setText(formattedTime);
+                    Bitmap bitmap = resizeImage(path);
+                    detailImage.setImageBitmap(bitmap);
+                }
+            }
+        });
 
         navigation = (BottomNavigationView) findViewById(R.id.bottom_navigation);
         navigation.setOnNavigationItemSelectedListener(item -> {
@@ -200,6 +272,7 @@ public class DetailRemovePhotoActivity extends AppCompatActivity {
         WindowManager.LayoutParams windowAttributes= window.getAttributes();
         windowAttributes.gravity = Gravity.CENTER;
         window.setAttributes(windowAttributes);
+        window.setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
 
         dialog.setCancelable(true);
         Button btnSubmit = dialog.findViewById(R.id.btnSubmit_check);
@@ -211,7 +284,11 @@ public class DetailRemovePhotoActivity extends AppCompatActivity {
                 deleteImageFromMediaStore(DetailRemovePhotoActivity.this,imageId);
                 albumDbHelper.deleteImageById(imageId);
                 dialog.dismiss();
-                onBackPressedExit();
+
+                Intent intent = new Intent();
+                intent.putExtra("isUpdate", true);
+                setResult(RESULT_OK, intent);
+                finish();
             }
         });
 

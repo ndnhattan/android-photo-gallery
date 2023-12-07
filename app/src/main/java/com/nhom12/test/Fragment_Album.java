@@ -1,12 +1,25 @@
 package com.nhom12.test;
 
 import android.app.Dialog;
+import android.app.SearchManager;
 import android.content.ContentValues;
+import android.content.Context;
+import android.content.Intent;
 import android.database.Cursor;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 
+import androidx.activity.result.ActivityResult;
+import androidx.activity.result.ActivityResultCallback;
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.appcompat.widget.SearchView;
 import androidx.appcompat.widget.Toolbar;
+import androidx.core.view.MenuItemCompat;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -17,6 +30,8 @@ import android.provider.MediaStore;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
@@ -67,6 +82,8 @@ public class Fragment_Album extends Fragment {
     GridAlbumAdapter adapter;
     ArrayList<Album> albumList = new ArrayList<>();
     AlbumDbHelper albumDbHelper;
+
+    SearchView searchView;
 
     /**
      * Use this factory method to create a new instance of
@@ -158,92 +175,106 @@ public class Fragment_Album extends Fragment {
 
         mToolbar = (Toolbar) rootView.findViewById(R.id.toolbar_album);
 
+        //search album
+        MenuItem searchItem = mToolbar.getMenu().findItem(R.id.search_album);
+        searchView = (SearchView) searchItem.getActionView();
+        searchView.setIconified(true);
+        SearchManager searchManager = (SearchManager) getActivity().getSystemService(Context.SEARCH_SERVICE);
+        searchView.setSearchableInfo(searchManager.getSearchableInfo(getActivity().getComponentName()));
+
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                adapter.getFilter().filter(query);
+                return false;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String newText) {
+                adapter.getFilter().filter(newText);
+                return false;
+            }
+        });
+
+
         mToolbar.setOnMenuItemClickListener(item -> {
 
             int id = item.getItemId();
 
             if (id == R.id.add_album) {
-                item.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
+                final Dialog dialog = new Dialog(main);
+                dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+                dialog.setContentView(R.layout.layout_add_album);
+                Window window = dialog.getWindow();
+                if(window == null){
+                    return false;
+                }
+                window.setLayout(WindowManager.LayoutParams.WRAP_CONTENT, WindowManager.LayoutParams.WRAP_CONTENT);
+
+                WindowManager.LayoutParams windowAttributes= window.getAttributes();
+                window.setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+                windowAttributes.gravity = Gravity.CENTER;
+                window.setAttributes(windowAttributes);
+
+                dialog.setCancelable(true);
+                EditText edtCreateAlbum = dialog.findViewById(R.id.edt_createAlbum);
+                Button btnSubmit = dialog.findViewById(R.id.btnSubmit_createAlbum);
+                Button btnExit = dialog.findViewById(R.id.btnExit_createAlbum);
+
+                btnSubmit.setOnClickListener(new View.OnClickListener() {
                     @Override
-                    public boolean onMenuItemClick(@NonNull MenuItem menuItem) {
-                        final Dialog dialog = new Dialog(main);
-                        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
-                        dialog.setContentView(R.layout.layout_add_album);
-                        Window window = dialog.getWindow();
-                        if(window == null){
-                            return false;
-                        }
-                        window.setLayout(WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.WRAP_CONTENT);
-
-                        WindowManager.LayoutParams windowAttributes= window.getAttributes();
-                        windowAttributes.gravity = Gravity.CENTER;
-                        window.setAttributes(windowAttributes);
-
-                        dialog.setCancelable(true);
-                        EditText edtCreateAlbum = dialog.findViewById(R.id.edt_createAlbum);
-                        Button btnSubmit = dialog.findViewById(R.id.btnSubmit_createAlbum);
-                        Button btnExit = dialog.findViewById(R.id.btnExit_createAlbum);
-
-                        btnSubmit.setOnClickListener(new View.OnClickListener() {
-                            @Override
-                            public void onClick(View view) {
-                                String name = edtCreateAlbum.getText().toString();
-                                if(!name.equals("")){
-                                    albumDbHelper.addAlbum(name, -1);
-                                    long albumID = albumDbHelper.getAlbumIdByAlbumName(name);
-                                    Album newAlbum = new Album(albumID, name, "");
-                                    albumList.add(newAlbum);
-                                    Toast.makeText(main, "Created", Toast.LENGTH_SHORT).show();
-                                    adapter = new GridAlbumAdapter(main, albumList);
-                                    myGridView.setAdapter(adapter);
-                                    adapter.setOnItemClickListener(new OnItemClickListener() {
-                                        @Override
-                                        public void onItemClick(int position) {
-                                            // Xử lý khi một item được click
-                                            Toast.makeText(main, "Name: " + albumList.get(position).getName(), Toast.LENGTH_SHORT).show();
-                                            Fragment_Album_Photo fragmentPhoto = Fragment_Album_Photo.newInstance(albumList.get(position).getAlbumID(), albumList.get(position).getName());
-                                            FragmentTransaction fr = getFragmentManager().beginTransaction();
-                                            fr.replace(R.id.body_container, fragmentPhoto);
-                                            fr.commit();
-                                        }
-                                    });
+                    public void onClick(View view) {
+                        String name = edtCreateAlbum.getText().toString();
+                        if(!name.equals("")){
+                            albumDbHelper.addAlbum(name, -1);
+                            long albumID = albumDbHelper.getAlbumIdByAlbumName(name);
+                            Album newAlbum = new Album(albumID, name, "");
+                            albumList.add(newAlbum);
+                            Toast.makeText(main, "Created", Toast.LENGTH_SHORT).show();
+                            adapter = new GridAlbumAdapter(main, albumList);
+                            myGridView.setAdapter(adapter);
+                            adapter.setOnItemClickListener(new OnItemClickListener() {
+                                @Override
+                                public void onItemClick(Album album) {
+                                    // Xử lý khi một item được click
+                                    Fragment_Album_Photo fragmentPhoto = Fragment_Album_Photo.newInstance(album.getAlbumID(), album.getName());
+                                    FragmentTransaction fr = getFragmentManager().beginTransaction();
+                                    fr.replace(R.id.body_container, fragmentPhoto);
+                                    fr.commit();
                                 }
-                                dialog.dismiss();
-                            }
-                        });
-
-                        btnExit.setOnClickListener(new View.OnClickListener() {
-                            @Override
-                            public void onClick(View view) {
-                                dialog.dismiss();
-                            }
-                        });
-                        dialog.show();
-                        return true;
+                            });
+                        }
+                        dialog.dismiss();
                     }
                 });
+
+                btnExit.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        dialog.dismiss();
+                    }
+                });
+                dialog.show();
                 return true;
-            } else if (id == R.id.search) {
-                Toast.makeText(getActivity(), "Search", Toast.LENGTH_LONG).show();
-                return true;
-            } else
+            } else {
                 return false;
+            }
 
         });
 
-        listImages();
+//        listImages();
         loadAllALbum();
-        myGridView = ((RecyclerView) rootView.findViewById(R.id.layout_grid_album));
         adapter = new GridAlbumAdapter(main, albumList);
+        myGridView = ((RecyclerView) rootView.findViewById(R.id.layout_grid_album));
         myGridView.setAdapter(adapter);
         myGridView.setLayoutManager(new StaggeredGridLayoutManager(4, StaggeredGridLayoutManager.VERTICAL));
         myGridView.addItemDecoration(new SpaceItemDecoration(12));
 
         adapter.setOnItemClickListener(new OnItemClickListener() {
             @Override
-            public void onItemClick(int position) {
+            public void onItemClick(Album album) {
                 // Xử lý khi một item được click
-                Fragment_Album_Photo fragmentPhoto = Fragment_Album_Photo.newInstance(albumList.get(position).getAlbumID(), albumList.get(position).getName()); //fragment hien thi danh sach cac anh theo ten album
+                Fragment_Album_Photo fragmentPhoto = Fragment_Album_Photo.newInstance(album.getAlbumID(), album.getName()); //fragment hien thi danh sach cac anh theo ten album
                 FragmentTransaction fr = getFragmentManager().beginTransaction();
                 fr.replace(R.id.body_container, fragmentPhoto);
                 fr.commit();
@@ -252,6 +283,4 @@ public class Fragment_Album extends Fragment {
 
         return rootView;
     }
-
-
 }

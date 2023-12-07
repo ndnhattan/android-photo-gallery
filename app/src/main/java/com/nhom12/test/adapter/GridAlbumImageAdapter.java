@@ -3,14 +3,13 @@ package com.nhom12.test.adapter;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
-import android.provider.MediaStore;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AbsListView;
 import android.widget.ImageView;
-import android.widget.Toast;
 
+import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
@@ -23,10 +22,12 @@ import com.nhom12.test.activities.DetailRemovePhotoActivity;
 public class GridAlbumImageAdapter extends RecyclerView.Adapter<GridAlbumImageAdapter.ViewHolder>{
     private Cursor rs;
     private Context context;
+    Fragment fragment;
 
-    public GridAlbumImageAdapter(Context context, Cursor rs) {
+    public GridAlbumImageAdapter(Context context, Cursor rs, Fragment fragment) {
         this.context = context;
         this.rs = rs;
+        this.fragment = fragment;
     }
 
     @Override
@@ -70,7 +71,7 @@ public class GridAlbumImageAdapter extends RecyclerView.Adapter<GridAlbumImageAd
                     myIntentRemove.putExtra("date", imageDate);
                     myIntentRemove.putExtra("id", imageId);
                     myIntentRemove.putExtra("albumId", albumID);
-                    context.startActivity(myIntentRemove);
+                    fragment.startActivityForResult(myIntentRemove, 2);
                 } else {
                     Intent myIntent = new Intent(context, DetailPhotoActivity.class);
                     myIntent.putExtra("path", path);
@@ -78,7 +79,7 @@ public class GridAlbumImageAdapter extends RecyclerView.Adapter<GridAlbumImageAd
                     myIntent.putExtra("date", imageDate);
                     myIntent.putExtra("id", imageId);
                     myIntent.putExtra("albumId", albumID);
-                    context.startActivity(myIntent);
+                    fragment.startActivityForResult(myIntent, 1);
                 }
             }
         });

@@ -1,38 +1,60 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
+    android:layout_width="wrap_content"
     android:layout_height="wrap_content"
     android:orientation="vertical"
-    android:padding="20dp">
+    android:background="@drawable/bg_add_album"
+    android:padding="20dp"
+    android:layout_gravity="center">
 
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Xac nhan"
-        android:textSize="22sp"
+        android:textSize="20sp"
+        android:textColor="@color/black"
+        android:text="Confirm Remove"
         android:textStyle="bold"
-        android:layout_marginBottom="10dp"
+        android:gravity="center"
+        android:layout_marginBottom="6dp"
         />
 
-    <LinearLayout
+    <TextView
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:textSize="14sp"
+        android:textColor="@color/black"
+        android:text="Are you sure you want to remove ?"
+        android:gravity="center"
+        android:layout_marginBottom="6dp"
+        />
+
+
+    <LinearLayout
+        android:layout_width="240dp"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_marginTop="16dp">
 
         <Button
             android:id="@+id/btnExit_check"
             android:layout_width="0dp"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
             android:layout_weight="1"
-            android:text="Exit"
-            android:textSize="14sp"/>
+            android:backgroundTint="@color/white"
+            android:text="Cancel"
+            android:textColor="#E91E63"
+            android:textSize="14sp"
+            />
 
         <Button
             android:id="@+id/btnSubmit_check"
             android:layout_width="0dp"
+            android:layout_height="match_parent"
             android:layout_weight="1"
-            android:layout_height="wrap_content"
+            android:backgroundTint="#E82E6D"
             android:text="OK"
-            android:textSize="14sp"/>
+            android:textColor="@color/white"
+            android:textSize="14sp" />
 
     </LinearLayout>
 

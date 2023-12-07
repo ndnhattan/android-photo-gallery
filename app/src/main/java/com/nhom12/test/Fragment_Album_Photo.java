@@ -1,8 +1,10 @@
 package com.nhom12.test;
 
+import android.content.Intent;
 import android.database.Cursor;
 import android.os.Bundle;
 
+import androidx.annotation.Nullable;
 import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
@@ -15,6 +17,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
 
+import com.nhom12.test.activities.DetailPhotoActivity;
+import com.nhom12.test.activities.DetailRemovePhotoActivity;
 import com.nhom12.test.adapter.ListAlbumImageAdapter;
 import com.nhom12.test.adapter.ListImageAdapter;
 import com.nhom12.test.database.AlbumDbHelper;
@@ -49,6 +53,8 @@ public class Fragment_Album_Photo extends Fragment {
     AlbumDbHelper albumDbHelper;
     Toolbar mToolbar;
 
+    ListAlbumImageAdapter listAlbumImageAdapter;
+
     public Fragment_Album_Photo() {
         // Required empty public constructor
     }
@@ -80,13 +86,28 @@ public class Fragment_Album_Photo extends Fragment {
     }
 
     @Override
+    public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (resultCode == main.RESULT_OK) {
+            boolean isUpdate = data.getBooleanExtra("isUpdate", false);
+            if(isUpdate){
+                Toast.makeText(main, "Refresh", Toast.LENGTH_SHORT).show();
+                rs.clear();
+                listImages(albumID);
+                listAlbumImageAdapter.setData(rs);
+            }
+        }
+    }
+
+    @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment__album__photo, container, false);
-
         recyclerView = (RecyclerView) rootView.findViewById(R.id.recyclerView);
         rs.clear();
         listImages(albumID); // tim nhung anh co cung album name luu vao rs
-        recyclerView.setAdapter(new ListAlbumImageAdapter(main, rs));
+        listAlbumImageAdapter = new ListAlbumImageAdapter(main, rs, this);
+//        recyclerView.setAdapter(new ListAlbumImageAdapter(main, rs));
+        recyclerView.setAdapter(listAlbumImageAdapter);
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(main);
         recyclerView.setLayoutManager(linearLayoutManager);
 
