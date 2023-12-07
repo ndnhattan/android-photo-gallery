@@ -21,6 +21,11 @@ import com.bumptech.glide.load.resource.bitmap.RoundedCorners;
 import com.bumptech.glide.request.RequestOptions;
 import com.nhom12.test.R;
 import com.nhom12.test.activities.DetailPhotoActivity;
+<<<<<<< Updated upstream
+=======
+import com.nhom12.test.database.AlbumDbHelper;
+import com.nhom12.test.database.DatabaseSingleton;
+>>>>>>> Stashed changes
 
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -77,6 +82,7 @@ public class GridImageAdapter extends RecyclerView.Adapter<GridImageAdapter.View
                 Intent myIntent = new Intent(context, DetailPhotoActivity.class);
                 myIntent.putExtra("path", path);
 
+<<<<<<< Updated upstream
                 int dateColumnIndex = rs.getColumnIndex(MediaStore.Images.Media.DATE_ADDED);
                 String imageDate = rs.getString(dateColumnIndex);
                 myIntent.putExtra("date", imageDate);
@@ -84,6 +90,8 @@ public class GridImageAdapter extends RecyclerView.Adapter<GridImageAdapter.View
                 ((Activity) context).startActivityForResult(myIntent, REQUEST_CODE_PIC);
             }
         });
+=======
+>>>>>>> Stashed changes
     }
 
 

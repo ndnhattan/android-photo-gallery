@@ -55,6 +55,63 @@ public class Fragment_Photo extends Fragment {
         }
     }
 
+<<<<<<< Updated upstream
+=======
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (resultCode == main.RESULT_OK) {
+            boolean isUpdate = data.getBooleanExtra("isUpdate", false);
+            if(isUpdate){
+                rs.clear();
+                loadImages();
+                listImageAdapter.setData(rs);
+            }
+        }
+    }
+
+    private void loadImages() {
+        result = albumDbHelper.readAllImages();
+        int position = 0;
+        int preyear = 0, premonth = 0, preday = 0;
+        if (result != null) {
+            result.moveToPosition(-1);
+            while (result.moveToNext()) {
+                String imageDate = result.getString(2);
+                Timestamp tms = new Timestamp(Long.parseLong(imageDate) * 1000);
+                Date date = new Date(tms.getTime());
+                int year = date.getYear() + 1900;
+                int month = date.getMonth() + 1;
+                int day = date.getDate();
+                if (preyear != 0 &&
+                        (preyear < year ||
+                                (preyear == year && premonth < month) ||
+                                (preyear == year && premonth == month && preday <= day))
+                ) {
+                    continue;
+                }
+                preyear = year;
+                premonth = month;
+                preday = day;
+
+                // Calculate the timestamp for the start of the selected month
+                long startOfMonth = getStartOfMonthTimestamp(year, month, day);
+
+                // Calculate the timestamp for the end of the selected month
+                long endOfMonth = startOfMonth + 24 * 60 * 60;
+
+                // Define the selection arguments
+                Cursor monthImage = albumDbHelper.readImageByDate(startOfMonth, endOfMonth);
+
+                rs.add(monthImage);
+                indexArr.add(position);
+                position += monthImage.getCount() - 1;
+                result.moveToPosition(position);
+            }
+        }
+    }
+
+>>>>>>> Stashed changes
     private void listImages() {
         String[] projection = {MediaStore.Images.Media._ID,
                 MediaStore.Images.Media.DATA, // Path to the image file

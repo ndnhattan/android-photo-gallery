@@ -1,50 +1,53 @@
 package com.nhom12.test;
 
+import android.content.Intent;
+import android.database.Cursor;
 import android.os.Bundle;
 
+import androidx.annotation.Nullable;
 import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.Toast;
 
-/**
- * A simple {@link Fragment} subclass.
- * Use the {@link Fragment_Favorite#newInstance} factory method to
- * create an instance of this fragment.
- */
+import com.nhom12.test.adapter.ListAlbumImageAdapter;
+import com.nhom12.test.adapter.ListImageAdapter;
+import com.nhom12.test.database.AlbumDbHelper;
+import com.nhom12.test.database.DatabaseSingleton;
+
+import java.sql.Date;
+import java.sql.Timestamp;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.List;
+import java.util.Set;
+
+
 public class Fragment_Private_Access extends Fragment {
 
-    // TODO: Rename parameter arguments, choose names that match
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-    private static final String ARG_PARAM1 = "param1";
-    private static final String ARG_PARAM2 = "param2";
-
-    // TODO: Rename and change types of parameters
-    private String mParam1;
-    private String mParam2;
-
+    private static final String ARG_PARAM1 = "par1";
+    private long albumID = 3;
+    ArrayList<Cursor> rs = new ArrayList<>();
+    MainActivity main;
+    RecyclerView recyclerView;
+    AlbumDbHelper albumDbHelper;
+    Toolbar mToolbar;
+    ListAlbumImageAdapter listAlbumImageAdapter;
     public Fragment_Private_Access() {
-        // Required empty public constructor
+
     }
 
-    /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     *
-     * @param param1 Parameter 1.
-     * @param param2 Parameter 2.
-     * @return A new instance of fragment Fragment_Love.
-     */
-    // TODO: Rename and change types and number of parameters
-    public static Fragment_Private_Access newInstance(String param1, String param2) {
+    public static Fragment_Private_Access newInstance(long albumID) {
         Fragment_Private_Access fragment = new Fragment_Private_Access();
         Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
+        args.putLong(ARG_PARAM1, albumID);
         fragment.setArguments(args);
         return fragment;
     }
@@ -52,17 +55,42 @@ public class Fragment_Private_Access extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        if (getArguments() != null) {
+            albumID = getArguments().getLong(ARG_PARAM1);
+        }
         setHasOptionsMenu(true);
-
-        //main = (MainActivity) getActivity();
+        try {
+            main = (MainActivity) getActivity();
+            albumDbHelper = DatabaseSingleton.getInstance(main).getDbHelper();
+        } catch (IllegalStateException e) {
+            throw new IllegalStateException("MainActivity must implement callbacks");
+        }
     }
-
-    Toolbar mToolbar;
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (resultCode == main.RESULT_OK) {
+            boolean isUpdate = data.getBooleanExtra("isUpdate", false);
+            if(isUpdate){
+                rs.clear();
+                listImages(albumID);
+                listAlbumImageAdapter.setData(rs);
+            }
+        }
+    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-
         View rootView = inflater.inflate(R.layout.fragment__private__access, container, false);
+        recyclerView = (RecyclerView) rootView.findViewById(R.id.recyclerViewPrivate);
+        rs.clear();
+        listImages(3);
+        listAlbumImageAdapter = new ListAlbumImageAdapter(main, rs, this);
+        recyclerView.setAdapter(listAlbumImageAdapter);
+
+
+        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(main);
+        recyclerView.setLayoutManager(linearLayoutManager);
 
         mToolbar = rootView.findViewById(R.id.toolbar_private_access);
 
@@ -87,9 +115,54 @@ public class Fragment_Private_Access extends Fragment {
                 return false;
 
         });
-
-
-
         return rootView;
+    }
+    private void listImages(long albumID) {
+        Cursor result = albumDbHelper.readImageByAlbumID(albumID);
+        int position = 0;
+        int preyear = 0, premonth = 0, preday = 0;
+        while (result.moveToNext()) {
+            String imageDate = result.getString(2);
+            Timestamp tms = new Timestamp(Long.parseLong(imageDate) * 1000);
+            Date date = new Date(tms.getTime());
+            int year = date.getYear() + 1900;
+            int month = date.getMonth() + 1;
+            int day = date.getDate();
+            if (preyear != 0 &&
+                    (preyear < year ||
+                            (preyear == year && premonth < month) ||
+                            (preyear == year && premonth == month && preday <= day))
+            ) {
+                continue;
+            }
+            preyear = year;
+            premonth = month;
+            preday = day;
+
+            // Calculate the timestamp for the start of the selected month
+            long startOfMonth = getStartOfMonthTimestamp(year, month, day);
+
+            // Calculate the timestamp for the end of the selected month
+            long endOfMonth = startOfMonth + 24 * 60 * 60;
+
+            // Define the selection arguments
+            Cursor monthImage = albumDbHelper.readImageByAlbumIDAndByDate(albumID, startOfMonth, endOfMonth);
+
+            rs.add(monthImage);
+            position += monthImage.getCount() - 1;
+            result.moveToPosition(position);
+        }
+    }
+
+    private static long getStartOfMonthTimestamp(int year, int month,int day) {
+        Calendar calendar = Calendar.getInstance();
+        calendar.set(Calendar.YEAR, year);
+        calendar.set(Calendar.MONTH, month - 1); // Month is 0-based
+        calendar.set(Calendar.DAY_OF_MONTH, day);
+        calendar.set(Calendar.HOUR_OF_DAY, 0);
+        calendar.set(Calendar.MINUTE, 0);
+        calendar.set(Calendar.SECOND, 0);
+        calendar.set(Calendar.MILLISECOND, 0);
+        return calendar.getTimeInMillis() / 1000; // Convert to seconds
     }
 }
