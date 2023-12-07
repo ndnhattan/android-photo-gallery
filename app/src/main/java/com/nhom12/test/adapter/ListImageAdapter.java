@@ -10,6 +10,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import androidx.fragment.app.Fragment;
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.RecyclerView;
@@ -60,6 +61,8 @@ public class ListImageAdapter extends RecyclerView.Adapter<ListImageAdapter.View
         int month = date.getMonth();
         int day = date.getDate();
 
+        holder.textView.setText(String.valueOf(day) +" tháng " + String.valueOf(month + 1) + ", năm " + String.valueOf(year + 1900));
+        holder.recyclerView.setAdapter(new GridImageAdapter(context, result, position, fragment));
         holder.textView.setText(String.valueOf(day) + " tháng " + String.valueOf(month + 1) + ", năm " + String.valueOf(year + 1900));
         holder.recyclerView.setAdapter(new GridImageAdapter(context, result, position, fragment));
         holder.recyclerView.setLayoutManager(new StaggeredGridLayoutManager(4, StaggeredGridLayoutManager.VERTICAL));

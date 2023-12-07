@@ -27,6 +27,8 @@ import com.bumptech.glide.request.RequestOptions;
 import com.nhom12.test.Fragment_Photo;
 import com.nhom12.test.R;
 import com.nhom12.test.activities.DetailPhotoActivity;
+import com.nhom12.test.database.AlbumDbHelper;
+import com.nhom12.test.database.DatabaseSingleton;
 import com.nhom12.test.activities.SelectActivity;
 import com.nhom12.test.database.AlbumDbHelper;
 import com.nhom12.test.database.DatabaseSingleton;

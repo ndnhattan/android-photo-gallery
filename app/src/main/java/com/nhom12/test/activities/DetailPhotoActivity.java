@@ -1,5 +1,10 @@
 package com.nhom12.test.activities;
 
+import android.annotation.SuppressLint;
+import android.app.Dialog;
+import android.content.ContentUris;
+import android.content.Context;
+import android.content.DialogInterface;
 import android.app.Dialog;
 import android.content.ContentUris;
 import android.content.Context;
@@ -14,6 +19,7 @@ import android.provider.MediaStore;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.Gravity;
+import android.view.Menu;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
@@ -42,7 +48,10 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.view.menu.ActionMenuItem;
+import androidx.appcompat.view.menu.ActionMenuItemView;
 import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
@@ -92,12 +101,12 @@ public class DetailPhotoActivity extends AppCompatActivity{
     TextView txtDate, txtTime;
     boolean flag = true;
     BottomNavigationView navigation;
-    AlbumDbHelper albumDbHelper;
-
-    //new
+  
     private List<String> listFavorImgPath;
     private int pos;
+    AlbumDbHelper albumDbHelper;
     FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+    boolean isFavorite = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState){
@@ -125,6 +134,11 @@ public class DetailPhotoActivity extends AppCompatActivity{
         String formattedTime = dateFormat.format(date);
 
         mToolbar = (Toolbar) findViewById(R.id.toolbar_detail_photo);
+        MenuItem favoriteItem = mToolbar.getMenu().findItem(R.id.add_to_favor);
+        if (albumDbHelper.checkAlbumImageExistsVer2(imageId, 1)) {
+            isFavorite = true;
+        }
+        favoriteItem.setIcon(isFavorite ? R.drawable.icon_favorite_red : R.drawable.icon_favorite);
         mToolbar.setOnMenuItemClickListener(item -> {
             int id = item.getItemId();
 
@@ -163,19 +177,19 @@ public class DetailPhotoActivity extends AppCompatActivity{
                     ft.commit();
                 }
                 if (key == R.id.add_to_favor) {
-                    try {
-                        Set<String> imageListFavor = new HashSet<>();
-
-                        imageListFavor.add(value);
-
-                        DataLocalManager.setListImg(imageListFavor);
-                        Toast.makeText(getApplicationContext(), "Yêu thích ảnh thành công", Toast.LENGTH_LONG).show();
-                    } catch (Exception e) {
-                        e.printStackTrace();
-
-                        Toast.makeText(getApplicationContext(), "Error: " + e.getMessage(), Toast.LENGTH_LONG).show();
+                    if (!albumDbHelper.checkAlbumImageExistsVer2(imageId, 1)) {
+                        albumDbHelper.moveImageToAlbumFavor(imageId, albumId);
+                        item.setIcon(R.drawable.icon_favorite_red);
+                    } else {
+                        albumDbHelper.removeImageFromAlbumFavor(imageId);
+                        item.setIcon(R.drawable.icon_favorite);
                     }
-                } else if (key == R.id.btn_info) {
+                }
+                else if(key == R.id.btn_info){
+
+                    Intent intent = new Intent();
+                    intent.putExtra("isUpdate", true);
+                    setResult(RESULT_OK, intent);
                     File imageFile = new File(value);
                     Uri targetUri = Uri.fromFile(imageFile);
                     if (targetUri != null) {
@@ -282,12 +296,57 @@ public class DetailPhotoActivity extends AppCompatActivity{
                 shareIntent.setType("image/*");
                 shareIntent.putExtra(Intent.EXTRA_STREAM, uri);
                 startActivity(Intent.createChooser(shareIntent, "Share Image"));
+            } else if (key == R.id.menu_detail_hide) {
+                AlertDialog.Builder builder = new AlertDialog.Builder(DetailPhotoActivity.this);
+
+                builder.setTitle("Confirm");
+                if (!albumDbHelper.checkAlbumImageExistsVer2(imageId, 3)) {
+                    builder.setMessage("Do you want to hide this image?");
+                    builder.setPositiveButton("HIDE", new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int which) {
+                            albumDbHelper.moveImageToAlbum(imageId, albumId,3);
+
+                            Toast.makeText(DetailPhotoActivity.this, "Image hidden", Toast.LENGTH_SHORT).show();
+                            Intent intent = new Intent();
+                            intent.putExtra("isUpdate", true);
+                            setResult(RESULT_OK, intent);
+                            finish();
+                            dialog.dismiss();
+                        }
+                    });
+                }
+                else{
+                    builder.setMessage("Do you want to unhide this image?");
+                    builder.setPositiveButton("UNHIDE", new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int which) {
+                            albumDbHelper.removeImageFromAlbumPrivate(imageId);
+
+                            Toast.makeText(DetailPhotoActivity.this, "Unhide image successfully", Toast.LENGTH_SHORT).show();
+                            Intent intent = new Intent();
+                            intent.putExtra("isUpdate", true);
+                            setResult(RESULT_OK, intent);
+                            finish();
+                            dialog.dismiss();
+                        }
+                    });
+                }
+
+                builder.setNegativeButton("CANCEL", new DialogInterface.OnClickListener() {
+
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                    }
+                });
+                AlertDialog alert = builder.create();
+                alert.show();
             }
 
             return true;
         });
 
     }
+
 
     public Bitmap resizeImage(String imagePath) {
         Bitmap originalBitmap = BitmapFactory.decodeFile(imagePath);

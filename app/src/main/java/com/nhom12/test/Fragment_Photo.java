@@ -73,7 +73,6 @@ public class Fragment_Photo extends Fragment {
         if (resultCode == main.RESULT_OK) {
             boolean isUpdate = data.getBooleanExtra("isUpdate", false);
             if(isUpdate){
-                Toast.makeText(main, "Refresh", Toast.LENGTH_SHORT).show();
                 rs.clear();
                 loadImages();
                 listImageAdapter.setData(rs);

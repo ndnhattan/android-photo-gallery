@@ -65,9 +65,8 @@ public class DetailRemovePhotoActivity extends AppCompatActivity {
     BottomNavigationView navigation;
     AlbumDbHelper albumDbHelper;
     FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-
-
-
+    boolean isFavorite = false;
+  
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -104,7 +103,11 @@ public class DetailRemovePhotoActivity extends AppCompatActivity {
                 onBackPressed();
             }
         });
-
+        MenuItem favoriteItem = mToolbar.getMenu().findItem(R.id.add_to_favor);
+        if (albumDbHelper.checkAlbumImageExistsVer2(imageId, 1)) {
+            isFavorite = true;
+        }
+        favoriteItem.setIcon(isFavorite ? R.drawable.icon_favorite_red : R.drawable.icon_favorite);
         mToolbar.setOnMenuItemClickListener(new Toolbar.OnMenuItemClickListener() {
             @Override
             public boolean onMenuItemClick(MenuItem item) {
@@ -117,6 +120,16 @@ public class DetailRemovePhotoActivity extends AppCompatActivity {
                     Toast.makeText(DetailRemovePhotoActivity.this, "No Allow Copy", Toast.LENGTH_SHORT).show();
                 }
                 if (key == R.id.add_to_favor) {
+                    if (!albumDbHelper.checkAlbumImageExistsVer2(imageId, 1)) {
+                        albumDbHelper.moveImageToAlbumFavor(imageId, albumId);
+                        item.setIcon(R.drawable.icon_favorite_red);
+                    } else {
+                        albumDbHelper.removeImageFromAlbumFavor(imageId);
+                        item.setIcon(R.drawable.icon_favorite);
+                    }
+                    Intent intent = new Intent();
+                    intent.putExtra("isUpdate", true);
+                    setResult(RESULT_OK, intent);
                     try {
                         Set<String> imageListFavor = new HashSet<>();
 

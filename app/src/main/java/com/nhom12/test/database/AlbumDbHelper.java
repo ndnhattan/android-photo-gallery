@@ -332,7 +332,8 @@ public class AlbumDbHelper extends SQLiteOpenHelper {
     public Cursor readAllImages(){
         String query = "SELECT * FROM " + TABLE_IMAGES +
                 " WHERE " + IMAGE_ID + " NOT IN (" +
-                " SELECT " + AI_IMAGE_ID + " FROM " + TABLE_ALBUM_IMAGE + " WHERE " + AI_ALBUM_ID + " = 2 )" +
+                " SELECT " + AI_IMAGE_ID + " FROM " + TABLE_ALBUM_IMAGE + " WHERE " + AI_ALBUM_ID + " IN (2, 3) )" +
+
         " ORDER BY " + IMAGE_DATE + " DESC";
         SQLiteDatabase db = this.getReadableDatabase();
 
@@ -350,7 +351,8 @@ public class AlbumDbHelper extends SQLiteOpenHelper {
                 " WHERE " + TABLE_IMAGES + "." + IMAGE_DATE + " >= ?" +
                 " AND " + TABLE_IMAGES + "." + IMAGE_DATE + " < ?" +
                 " AND " + IMAGE_ID + " NOT IN (" +
-                " SELECT " + AI_IMAGE_ID + " FROM " + TABLE_ALBUM_IMAGE + " WHERE " + AI_ALBUM_ID + " = 2 )" +
+                " SELECT " + AI_IMAGE_ID + " FROM " + TABLE_ALBUM_IMAGE + " WHERE " + AI_ALBUM_ID + " IN (2, 3) )" +
+
                 " ORDER BY " + IMAGE_DATE + " DESC";
 
         Cursor cursor = null;
@@ -379,5 +381,59 @@ public class AlbumDbHelper extends SQLiteOpenHelper {
         return firstImageIdAlbum;
     }
 
+    public boolean checkAlbumImageExistsVer2(long imageId, long albumId) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        String query = "SELECT * FROM " + TABLE_ALBUM_IMAGE +
+                " WHERE " + AI_ALBUM_ID + " = ? AND " + AI_IMAGE_ID + " = ?";
+        String[] selectionArgs = {String.valueOf(albumId), String.valueOf(imageId)};
+        Cursor cursor = null;
+
+        try {
+            cursor = db.rawQuery(query, selectionArgs);
+            return cursor.getCount() > 0;
+        } finally {
+            if (cursor != null) {
+                cursor.close();
+            }
+        }
+    }
+    public void moveImageToAlbumFavor(long imageID, long albumIDCurrent) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues cv = new ContentValues();
+        cv.put(AI_ALBUM_ID, 1);
+
+        String selections = AI_IMAGE_ID + " = ? AND " + AI_ALBUM_ID + " = ?";
+        String[] selectionArgs = new String[]{String.valueOf(imageID), String.valueOf(albumIDCurrent)};
+        if (!checkAlbumImageExistsVer2(imageID, 1)) {
+            db.update(TABLE_ALBUM_IMAGE, cv, selections, selectionArgs);
+        }
+    }
+    public void removeImageFromAlbumFavor(long imageID) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        String deleteSelection = AI_IMAGE_ID + " = ? AND " + AI_ALBUM_ID + " = ?";
+        String[] deleteSelectionArgs = new String[]{String.valueOf(imageID), String.valueOf(1)};
+        db.delete(TABLE_ALBUM_IMAGE, deleteSelection, deleteSelectionArgs);
+    }
+
+    public void removeImageFromAlbumPrivate(long imageID) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        String deleteSelection = AI_IMAGE_ID + " = ? AND " + AI_ALBUM_ID + " = ?";
+        String[] deleteSelectionArgs = new String[]{String.valueOf(imageID), String.valueOf(3)};
+        db.delete(TABLE_ALBUM_IMAGE, deleteSelection, deleteSelectionArgs);
+    }
+
+    public Cursor readImageByAlbumIDAndByDate(long albumID, String date) {
+        SQLiteDatabase db = getReadableDatabase();
+
+        String sql = "SELECT image.* " +
+                "FROM image " +
+                "INNER JOIN album_image ON image.image_id = album_image.ai_image_id " +
+                "WHERE album_image.ai_album_id = ? AND " +
+                "strftime('%Y-%m-%d', image.image_date) = ?";
+
+        Cursor cursor = db.rawQuery(sql, new String[]{String.valueOf(albumID), date});
+
+        return cursor;
+    }
 
 }
