@@ -9,6 +9,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.recyclerview.widget.StaggeredGridLayoutManager;
 
@@ -21,10 +22,17 @@ import java.util.ArrayList;
 public class ListImageAdapter extends RecyclerView.Adapter<ListImageAdapter.ViewHolder> {
     private ArrayList<Cursor> rs;
     private Context context;
+    Fragment fragment;
 
-    public ListImageAdapter(Context context, ArrayList<Cursor> rs) {
+    public ListImageAdapter(Context context, ArrayList<Cursor> rs, Fragment fragment) {
         this.context = context;
         this.rs = rs;
+        this.fragment = fragment;
+    }
+
+    public void setData(ArrayList<Cursor> rs){
+        this.rs = rs;
+        notifyDataSetChanged();
     }
 
     @Override
@@ -51,7 +59,7 @@ public class ListImageAdapter extends RecyclerView.Adapter<ListImageAdapter.View
         int day = date.getDate();
 
         holder.textView.setText(String.valueOf(day) +" tháng " + String.valueOf(month + 1) + ", năm " + String.valueOf(year + 1900));
-        holder.recyclerView.setAdapter(new GridImageAdapter(context, result, position));
+        holder.recyclerView.setAdapter(new GridImageAdapter(context, result, position, fragment));
         holder.recyclerView.setLayoutManager(new StaggeredGridLayoutManager(4, StaggeredGridLayoutManager.VERTICAL));
         holder.recyclerView.addItemDecoration(new SpaceItemDecoration(12));
     }

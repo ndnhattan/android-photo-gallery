@@ -30,6 +30,7 @@ import com.nhom12.test.activities.DetailPhotoActivity;
 import com.nhom12.test.database.AlbumDbHelper;
 import com.nhom12.test.database.DatabaseSingleton;
 
+import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.ArrayList;
@@ -41,11 +42,13 @@ public class GridImageAdapter extends RecyclerView.Adapter<GridImageAdapter.View
     private ArrayList<String> album;
     private static int REQUEST_CODE_PIC = 10;
     AlbumDbHelper albumDbHelper; // db
+    Fragment fragment;
 
-    public GridImageAdapter(Context context, Cursor rs, int index) {
+    public GridImageAdapter(Context context, Cursor rs, int index, Fragment fragment) {
         this.context = context;
         this.rs = rs;
         this.index = index;
+        this.fragment = fragment;
     }
 
 
@@ -101,7 +104,8 @@ public class GridImageAdapter extends RecyclerView.Adapter<GridImageAdapter.View
                 myIntent.putExtra("date", imageDate);
                 myIntent.putExtra("id", imageId); // dt
                 myIntent.putExtra("albumId", albumId); // dt
-                context.startActivity(myIntent);
+                fragment.startActivityForResult(myIntent, 3);
+//                context.startActivity(myIntent);
             }
         });
 

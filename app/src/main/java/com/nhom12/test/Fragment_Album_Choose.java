@@ -118,9 +118,6 @@ public class Fragment_Album_Choose extends Fragment {
             @Override
             public void onItemClick(Album album) {
                 // Xử lý khi một item được click
-                System.out.println("id: " + imageId);
-                System.out.println("album current: " + albumId);
-                System.out.println("album new: " + album.getAlbumID());
 
                 if(isMove){
                     albumDbHelper.moveImageToAlbum(imageId, albumId, album.getAlbumID());
@@ -135,11 +132,12 @@ public class Fragment_Album_Choose extends Fragment {
                 }
 
                 if(isDetailRemoveActivity){
-                    Toast.makeText(mainDetailRemove, "Successfull", Toast.LENGTH_SHORT).show();
-                    mainDetailRemove.onBackPressed();
+                    Toast.makeText(mainDetailRemove, "Restore Successfull", Toast.LENGTH_SHORT).show();
+                    requireActivity().getSupportFragmentManager().popBackStack();
                 } else {
                     Toast.makeText(mainDetail, "Successfull", Toast.LENGTH_SHORT).show();
-                    mainDetail.onBackPressedExit();
+                    requireActivity().getSupportFragmentManager().popBackStack();
+//                    mainDetail.onBackPressedExit();
                 }
             }
         });

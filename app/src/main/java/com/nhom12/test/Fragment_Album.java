@@ -4,10 +4,19 @@ import android.app.Dialog;
 import android.app.SearchManager;
 import android.content.ContentValues;
 import android.content.Context;
+import android.content.Intent;
 import android.database.Cursor;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 
+import androidx.activity.result.ActivityResult;
+import androidx.activity.result.ActivityResultCallback;
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.widget.SearchView;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.view.MenuItemCompat;
@@ -106,7 +115,6 @@ public class Fragment_Album extends Fragment {
         }
     }
 
-
     private void listImages() {
 
         String[] projection = {
@@ -201,9 +209,10 @@ public class Fragment_Album extends Fragment {
                 if(window == null){
                     return false;
                 }
-                window.setLayout(WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.WRAP_CONTENT);
+                window.setLayout(WindowManager.LayoutParams.WRAP_CONTENT, WindowManager.LayoutParams.WRAP_CONTENT);
 
                 WindowManager.LayoutParams windowAttributes= window.getAttributes();
+                window.setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
                 windowAttributes.gravity = Gravity.CENTER;
                 window.setAttributes(windowAttributes);
 
@@ -228,7 +237,6 @@ public class Fragment_Album extends Fragment {
                                 @Override
                                 public void onItemClick(Album album) {
                                     // Xử lý khi một item được click
-                                    Toast.makeText(main, "Name: " + album.getName(), Toast.LENGTH_SHORT).show();
                                     Fragment_Album_Photo fragmentPhoto = Fragment_Album_Photo.newInstance(album.getAlbumID(), album.getName());
                                     FragmentTransaction fr = getFragmentManager().beginTransaction();
                                     fr.replace(R.id.body_container, fragmentPhoto);

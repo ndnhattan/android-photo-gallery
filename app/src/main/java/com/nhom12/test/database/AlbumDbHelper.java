@@ -331,6 +331,8 @@ public class AlbumDbHelper extends SQLiteOpenHelper {
 
     public Cursor readAllImages(){
         String query = "SELECT * FROM " + TABLE_IMAGES +
+                " WHERE " + IMAGE_ID + " NOT IN (" +
+                " SELECT " + AI_IMAGE_ID + " FROM " + TABLE_ALBUM_IMAGE + " WHERE " + AI_ALBUM_ID + " = 2 )" +
         " ORDER BY " + IMAGE_DATE + " DESC";
         SQLiteDatabase db = this.getReadableDatabase();
 
@@ -347,6 +349,8 @@ public class AlbumDbHelper extends SQLiteOpenHelper {
                 " FROM " + TABLE_IMAGES +
                 " WHERE " + TABLE_IMAGES + "." + IMAGE_DATE + " >= ?" +
                 " AND " + TABLE_IMAGES + "." + IMAGE_DATE + " < ?" +
+                " AND " + IMAGE_ID + " NOT IN (" +
+                " SELECT " + AI_IMAGE_ID + " FROM " + TABLE_ALBUM_IMAGE + " WHERE " + AI_ALBUM_ID + " = 2 )" +
                 " ORDER BY " + IMAGE_DATE + " DESC";
 
         Cursor cursor = null;

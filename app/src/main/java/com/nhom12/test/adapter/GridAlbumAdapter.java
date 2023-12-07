@@ -122,7 +122,6 @@ public class GridAlbumAdapter extends RecyclerView.Adapter<GridAlbumAdapter.View
                     }
                     albumList = albums;
                 }
-                System.out.println(albumList.size());
 
                 FilterResults filterResults = new FilterResults();
                 filterResults.values = albumList;
