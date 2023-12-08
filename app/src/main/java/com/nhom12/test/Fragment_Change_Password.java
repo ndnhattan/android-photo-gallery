@@ -57,6 +57,10 @@ public class Fragment_Change_Password extends Fragment {
                 String currentPassText = currentPass.getText().toString();
                 String newPassText = newPass.getText().toString();
                 String retypePassText = retypePass.getText().toString();
+                if(!newPassText.equals("")){
+                    Toast.makeText(getActivity(),"Invalid password", Toast.LENGTH_SHORT).show();
+                    return;
+                }
                 if(!currentPassText.equals(password)){
                     Toast.makeText(getActivity(),"Wrong password", Toast.LENGTH_SHORT).show();
                     return;
