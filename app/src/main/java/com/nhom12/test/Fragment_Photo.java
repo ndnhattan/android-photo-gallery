@@ -114,7 +114,7 @@ public class Fragment_Photo extends Fragment {
                 Cursor monthImage = albumDbHelper.readImageByDate(startOfMonth, endOfMonth);
 
                 rs.add(monthImage);
-                indexArr.add(position);
+                indexArr.add(position + rs.size() -1 );
                 position += monthImage.getCount() - 1;
                 result.moveToPosition(position);
             }
