@@ -3,9 +3,12 @@ package com.nhom12.test.activities;
 import android.annotation.SuppressLint;
 import android.content.ContentResolver;
 import android.content.ContentValues;
+import android.content.Context;
 import android.database.Cursor;
+import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Build;
+import android.os.Environment;
 import android.provider.MediaStore;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -16,7 +19,12 @@ import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.OnLifecycleEvent;
 
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Locale;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -154,5 +162,37 @@ public class FileSaveHelper implements LifecycleObserver {
 
     public static boolean isSdkHigherThan28() {
         return Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q;
+    }
+
+    public static String saveBitmap(Context context, Bitmap bitmap) {
+        String savedImagePath = null;
+
+        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(new Date());
+        String imageFileName = "JPEG_" + timeStamp + "_";
+
+        File storageDir = new File(Environment.getExternalStorageDirectory() + "/Pictures");
+        if (!storageDir.exists()) {
+            File wallpaperDirectory = new File("/sdcard/Pictures/");
+            wallpaperDirectory.mkdirs();
+        }
+
+        File imageFile;
+        try {
+            imageFile = File.createTempFile(
+                    imageFileName,  /* prefix */
+                    ".jpg",         /* suffix */
+                    storageDir      /* directory */
+            );
+
+            savedImagePath = imageFile.getAbsolutePath();
+
+            FileOutputStream fos = new FileOutputStream(imageFile);
+            bitmap.compress(Bitmap.CompressFormat.JPEG, 100, fos);
+            fos.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        return savedImagePath;
     }
 }

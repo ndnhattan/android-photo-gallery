@@ -1,12 +1,16 @@
 package com.nhom12.test.utils;
 
 import android.content.Context;
+import android.graphics.Matrix;
+import android.graphics.PointF;
 import android.util.Log;
 import android.view.GestureDetector;
 import android.view.GestureDetector.SimpleOnGestureListener;
 import android.view.MotionEvent;
+import android.view.ScaleGestureDetector;
 import android.view.View;
 import android.view.View.OnTouchListener;
+import android.widget.ImageView;
 import android.widget.Toast;
 
 public class OnSwipeTouchListener implements OnTouchListener {
@@ -48,8 +52,10 @@ public class OnSwipeTouchListener implements OnTouchListener {
                     if (Math.abs(diffX) > SWIPE_THRESHOLD && Math.abs(velocityX) > SWIPE_VELOCITY_THRESHOLD) {
                         if (diffX > 0) {
                             onSwipeRight();
+
                         } else {
                             onSwipeLeft();
+
                         }
                         result = true;
                     }
