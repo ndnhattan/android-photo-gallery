@@ -145,12 +145,13 @@ public class Fragment_Photo extends Fragment {
         String[] projection = {
                 MediaStore.Images.Media.BUCKET_DISPLAY_NAME,
                 MediaStore.Images.Media._ID,
-                MediaStore.Images.Media.DATA, // Path to the image file
+                MediaStore.Images.Media.DATA,
                 MediaStore.Images.Media.DATE_ADDED
         };
-        String sortOrder = MediaStore.Images.Media.BUCKET_DISPLAY_NAME + " ASC, " + MediaStore.Images.Media.DATE_ADDED + " DESC"; // Sort by date added in descending order
+        String sortOrder = MediaStore.Images.Media.BUCKET_DISPLAY_NAME + " ASC, " + MediaStore.Images.Media.DATE_ADDED + " DESC";
 
-        Cursor result = main.getContentResolver().query(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, projection, null, null, sortOrder);
+        Cursor result = main.getContentResolver().query(MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
+                                                        projection, null, null, sortOrder);
         String currentAlbumName = null;
         result.moveToPosition(-1);
         // Add album favorite
