@@ -117,7 +117,7 @@ public class GridImageAdapter extends RecyclerView.Adapter<GridImageAdapter.View
             public boolean onLongClick(View v) {
                 Intent myIntent = new Intent(context, SelectActivity.class);
                 myIntent.putExtra("index", Fragment_Photo.indexArr.get(index) + position);
-                fragment.startActivity(myIntent);
+                fragment.startActivityForResult(myIntent, 10);
                 return  true;
             }
         });

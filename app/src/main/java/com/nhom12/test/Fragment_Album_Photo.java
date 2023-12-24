@@ -48,6 +48,9 @@ public class Fragment_Album_Photo extends Fragment {
 
     //
     ArrayList<Cursor> rs = new ArrayList<>();
+    public static ArrayList<Integer> indexArr = new ArrayList<>();
+
+    public static Cursor result;
     MainActivity main;
     RecyclerView recyclerView;
     AlbumDbHelper albumDbHelper;
@@ -147,9 +150,10 @@ public class Fragment_Album_Photo extends Fragment {
     }
 
     private void listImages(long albumID) {
-        Cursor result = albumDbHelper.readImageByAlbumID(albumID);
+        result = albumDbHelper.readImageByAlbumID(albumID);
         int position = 0;
         int preyear = 0, premonth = 0, preday = 0;
+        indexArr.clear();
         while (result.moveToNext()) {
             String imageDate = result.getString(2);
             Timestamp tms = new Timestamp(Long.parseLong(imageDate) * 1000);
@@ -178,6 +182,7 @@ public class Fragment_Album_Photo extends Fragment {
             Cursor monthImage = albumDbHelper.readImageByAlbumIDAndByDate(albumID, startOfMonth, endOfMonth);
 
             rs.add(monthImage);
+            indexArr.add(position + rs.size() -1 );
             position += monthImage.getCount() - 1;
             result.moveToPosition(position);
         }
