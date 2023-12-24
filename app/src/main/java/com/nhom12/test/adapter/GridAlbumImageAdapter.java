@@ -1,5 +1,6 @@
 package com.nhom12.test.adapter;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
@@ -15,6 +16,8 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.bumptech.glide.request.RequestOptions;
+import com.nhom12.test.Fragment_Album_Photo;
+import com.nhom12.test.Fragment_Photo;
 import com.nhom12.test.R;
 import com.nhom12.test.activities.DetailPhotoActivity;
 import com.nhom12.test.activities.DetailRemovePhotoActivity;
@@ -22,12 +25,15 @@ import com.nhom12.test.activities.DetailRemovePhotoActivity;
 public class GridAlbumImageAdapter extends RecyclerView.Adapter<GridAlbumImageAdapter.ViewHolder>{
     private Cursor rs;
     private Context context;
+    private int index;
     Fragment fragment;
 
-    public GridAlbumImageAdapter(Context context, Cursor rs, Fragment fragment) {
+    public GridAlbumImageAdapter(Context context, Cursor rs, int index, Fragment fragment) {
         this.context = context;
         this.rs = rs;
         this.fragment = fragment;
+        this.index = index;
+
     }
 
     @Override
@@ -42,7 +48,7 @@ public class GridAlbumImageAdapter extends RecyclerView.Adapter<GridAlbumImageAd
     }
 
     @Override
-    public void onBindViewHolder(ViewHolder holder, int position) {
+    public void onBindViewHolder(ViewHolder holder, @SuppressLint("RecyclerView") int position) {
         rs.moveToPosition(position);
         String path = rs.getString(1);
         long imageId = rs.getLong(0);
@@ -64,6 +70,10 @@ public class GridAlbumImageAdapter extends RecyclerView.Adapter<GridAlbumImageAd
         holder.imageView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                // chuyen qua cho fragment photo vuot trai, phai
+                Fragment_Photo.index = Fragment_Album_Photo.indexArr.get(index) + position;
+                Fragment_Photo.result = Fragment_Album_Photo.result;
+                Fragment_Photo.result.moveToPosition(Fragment_Photo.index);
                 if(albumID == 2){
                     Intent myIntentRemove = new Intent(context, DetailRemovePhotoActivity.class);
                     myIntentRemove.putExtra("path", path);

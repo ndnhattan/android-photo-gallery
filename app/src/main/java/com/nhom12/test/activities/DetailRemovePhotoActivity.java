@@ -3,6 +3,7 @@ package com.nhom12.test.activities;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 
 import android.app.Dialog;
@@ -100,7 +101,12 @@ public class DetailRemovePhotoActivity extends AppCompatActivity {
         mToolbar.setNavigationOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                onBackPressed();
+                if(getSupportFragmentManager().findFragmentByTag("ft_album_move") != null){
+                    Toast.makeText(DetailRemovePhotoActivity.this, "OK", Toast.LENGTH_SHORT).show();
+                    getSupportFragmentManager().popBackStack("ft_album_move", FragmentManager.POP_BACK_STACK_INCLUSIVE);
+                }
+                else
+                    onBackPressed();
             }
         });
         MenuItem favoriteItem = mToolbar.getMenu().findItem(R.id.add_to_favor);
@@ -113,12 +119,14 @@ public class DetailRemovePhotoActivity extends AppCompatActivity {
             public boolean onMenuItemClick(MenuItem item) {
                 int key = item.getItemId();
                 if (key == R.id.move_to_album) {
-                    Fragment fragment = Fragment_Album_Choose.newInstance(imageId, albumId, true, true);
-                    ft.replace(R.id.body_container_detail_remove, fragment).addToBackStack("ft_album_move");
+                    Fragment fragment = Fragment_Album_Choose.newInstance(imageId, albumId, true, false);
+                    FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+                    ft.replace(R.id.body_container_detail_remove, fragment, "ft_album_move").addToBackStack("ft_album_move");
                     ft.commit();
-                } else if (key == R.id.copy_to_album) {
-                    Toast.makeText(DetailRemovePhotoActivity.this, "No Allow Copy", Toast.LENGTH_SHORT).show();
                 }
+//                else if (key == R.id.copy_to_album) {
+//                    Toast.makeText(DetailRemovePhotoActivity.this, "No Allow Copy", Toast.LENGTH_SHORT).show();
+//                }
                 if (key == R.id.add_to_favor) {
                     if (!albumDbHelper.checkAlbumImageExistsVer2(imageId, 1)) {
                         albumDbHelper.moveImageToAlbumFavor(imageId, albumId);

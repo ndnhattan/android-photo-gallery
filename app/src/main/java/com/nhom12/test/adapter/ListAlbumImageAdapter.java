@@ -62,7 +62,7 @@ public class ListAlbumImageAdapter extends RecyclerView.Adapter<ListAlbumImageAd
         int day = date.getDate();
 
         holder.textView.setText(String.valueOf(day) +" tháng " + String.valueOf(month + 1) + ", năm " + String.valueOf(year + 1900));
-        holder.recyclerView.setAdapter(new GridAlbumImageAdapter(context, result, fragment));
+        holder.recyclerView.setAdapter(new GridAlbumImageAdapter(context, result, position, fragment));
         holder.recyclerView.setLayoutManager(new StaggeredGridLayoutManager(4, StaggeredGridLayoutManager.VERTICAL));
         holder.recyclerView.addItemDecoration(new SpaceItemDecoration(12));
     }

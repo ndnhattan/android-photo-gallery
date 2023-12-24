@@ -55,6 +55,7 @@ import androidx.appcompat.view.menu.ActionMenuItem;
 import androidx.appcompat.view.menu.ActionMenuItemView;
 import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 
 import com.bumptech.glide.Glide;
@@ -106,7 +107,7 @@ public class DetailPhotoActivity extends AppCompatActivity{
     private List<String> listFavorImgPath;
     private int pos;
     AlbumDbHelper albumDbHelper;
-    FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+    //FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
     boolean isFavorite = false;
 
     @Override
@@ -144,8 +145,8 @@ public class DetailPhotoActivity extends AppCompatActivity{
             int id = item.getItemId();
 
             if (id == R.id.move_to_album) {
-                Fragment fragment = Fragment_Album_Choose.newInstance(imageId, albumId, false, true);
-                getSupportFragmentManager().beginTransaction().replace(R.id.body_container_detail, fragment).commit();
+//                Fragment fragment = Fragment_Album_Choose.newInstance(imageId, albumId, false, true);
+//                getSupportFragmentManager().beginTransaction().replace(R.id.body_container_detail, fragment).commit();
                 return true;
             } else
                 return false;
@@ -161,7 +162,13 @@ public class DetailPhotoActivity extends AppCompatActivity{
         mToolbar.setNavigationOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                onBackPressed();
+                if(getSupportFragmentManager().findFragmentByTag("ft_album_move") != null){
+                    Toast.makeText(DetailPhotoActivity.this, "OK", Toast.LENGTH_SHORT).show();
+                    getSupportFragmentManager().popBackStack("ft_album_move", FragmentManager.POP_BACK_STACK_INCLUSIVE);
+                }
+                else
+                    onBackPressed();
+
             }
         });
         mToolbar.setOnMenuItemClickListener(new Toolbar.OnMenuItemClickListener() {
@@ -169,14 +176,16 @@ public class DetailPhotoActivity extends AppCompatActivity{
             public boolean onMenuItemClick(MenuItem item) {
                 int key = item.getItemId();
                 if (key == R.id.move_to_album) {
-                    Fragment fragment = Fragment_Album_Choose.newInstance(imageId, albumId, false, true);
-                    ft.replace(R.id.body_container_detail, fragment).addToBackStack("ft_album_move");
-                    ft.commit();
-                } else if (key == R.id.copy_to_album){
                     Fragment fragment = Fragment_Album_Choose.newInstance(imageId, albumId, false, false);
-                    ft.replace(R.id.body_container_detail, fragment).addToBackStack("ft_album_copy");
+                    FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+                    ft.replace(R.id.body_container_detail, fragment, "ft_album_move").addToBackStack("ft_album_move");
                     ft.commit();
                 }
+//                else if (key == R.id.copy_to_album){
+//                    Fragment fragment = Fragment_Album_Choose.newInstance(imageId, albumId, false, false);
+//                    ft.replace(R.id.body_container_detail, fragment).addToBackStack("ft_album_copy");
+//                    ft.commit();
+//                }
                 if (key == R.id.add_to_favor) {
                     if (!albumDbHelper.checkAlbumImageExistsVer2(imageId, 1)) {
                         albumDbHelper.moveImageToAlbumFavor(imageId, albumId);

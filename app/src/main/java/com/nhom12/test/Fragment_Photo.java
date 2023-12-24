@@ -103,6 +103,7 @@ public class Fragment_Photo extends Fragment {
         result = albumDbHelper.readAllImages();
         int position = 0;
         int preyear = 0, premonth = 0, preday = 0;
+        indexArr.clear();
         if (result != null) {
             result.moveToPosition(-1);
             while (result.moveToNext()) {
@@ -237,4 +238,3 @@ public class Fragment_Photo extends Fragment {
         }
     }
 }
-    

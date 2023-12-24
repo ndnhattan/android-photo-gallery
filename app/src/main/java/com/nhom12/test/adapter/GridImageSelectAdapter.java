@@ -85,7 +85,7 @@ public class GridImageSelectAdapter extends RecyclerView.Adapter<GridImageSelect
             @Override
             public void onClick(View v) {
                 if (SelectActivity.checkedArr.contains(SelectActivity.indexArr.get(index) + position)) {
-                    SelectActivity.checkedArr.remove(SelectActivity.indexArr.get(index) + position);
+                    SelectActivity.checkedArr.remove(Integer.valueOf(SelectActivity.indexArr.get(index) + position));
                 } else {
                     SelectActivity.checkedArr.add(SelectActivity.indexArr.get(index) + position);
                 }
@@ -95,9 +95,10 @@ public class GridImageSelectAdapter extends RecyclerView.Adapter<GridImageSelect
             @Override
             public void onClick(View v) {
                 if (SelectActivity.checkedArr.contains(SelectActivity.indexArr.get(index) + position)) {
-                    SelectActivity.checkedArr.remove(SelectActivity.indexArr.get(index) + position);
+                    SelectActivity.checkedArr.remove(Integer.valueOf(SelectActivity.indexArr.get(index) + position));
                 } else {
                     SelectActivity.checkedArr.add(SelectActivity.indexArr.get(index) + position);
+                    holder.checkBox.setChecked(true);
                 }
             }
         });

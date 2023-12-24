@@ -20,7 +20,8 @@
         app:layout_constraintTop_toTopOf="parent"
         app:title="1 Selected"
         app:titleMarginStart="10dp"
-        app:titleTextColor="#FFFFFF">
+        app:titleTextColor="#FFFFFF"
+        app:menu="@menu/menu_toolbar_select_photo">
         <CheckBox
             android:id="@+id/toolbar_checkbox"
             android:layout_width="wrap_content"
