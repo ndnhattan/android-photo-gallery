@@ -39,7 +39,6 @@ import java.util.Set;
 
 
 public class Fragment_Favorite extends Fragment {
-<<<<<<< Updated upstream
 
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -64,8 +63,6 @@ public class Fragment_Favorite extends Fragment {
 
     Button favor;
 
-=======
->>>>>>> Stashed changes
     private static final String ARG_PARAM1 = "par1";
     private long albumID = 1;
     ArrayList<Cursor> rs = new ArrayList<>();

@@ -96,6 +96,7 @@ public class GridImageSelectAdapter extends RecyclerView.Adapter<GridImageSelect
             public void onClick(View v) {
                 if (SelectActivity.checkedArr.contains(SelectActivity.indexArr.get(index) + position)) {
                     SelectActivity.checkedArr.remove(Integer.valueOf(SelectActivity.indexArr.get(index) + position));
+                    holder.checkBox.setChecked(false);
                 } else {
                     SelectActivity.checkedArr.add(SelectActivity.indexArr.get(index) + position);
                     holder.checkBox.setChecked(true);
