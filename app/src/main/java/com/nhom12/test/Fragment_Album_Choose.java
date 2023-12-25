@@ -16,6 +16,7 @@ import android.widget.Toast;
 
 import com.nhom12.test.activities.DetailPhotoActivity;
 import com.nhom12.test.activities.DetailRemovePhotoActivity;
+import com.nhom12.test.activities.SelectActivity;
 import com.nhom12.test.adapter.GridAlbumAdapter;
 import com.nhom12.test.adapter.SpaceItemDecoration;
 import com.nhom12.test.database.AlbumDbHelper;
@@ -42,11 +43,12 @@ public class Fragment_Album_Choose extends Fragment {
     private long imageId;
     private long albumId;
     boolean isDetailRemoveActivity = false;
-    boolean isMove = false;
+    boolean isSelectMultiple = false;
 
     // Variable
     DetailPhotoActivity mainDetail;
     DetailRemovePhotoActivity mainDetailRemove;
+    SelectActivity mainDetailSelect;
     ArrayList<Album> albumList = new ArrayList<>();
     AlbumDbHelper albumDbHelper;
     RecyclerView recyclerView;
@@ -63,13 +65,13 @@ public class Fragment_Album_Choose extends Fragment {
      * @return A new instance of fragment Fragment_Album_Choose.
      */
     // TODO: Rename and change types and number of parameters
-    public static Fragment_Album_Choose newInstance(long imageId, long albumId, boolean isDetailRemoveActivity, boolean isMove) {
+    public static Fragment_Album_Choose newInstance(long imageId, long albumId, boolean isDetailRemoveActivity, boolean isSelectMultiple) {
         Fragment_Album_Choose fragment = new Fragment_Album_Choose();
         Bundle args = new Bundle();
         args.putLong(ARG_PARAM1, imageId);
         args.putLong(ARG_PARAM2, albumId);
         args.putBoolean(ARG_PARAM3, isDetailRemoveActivity);
-        args.putBoolean(ARG_PARAM4, isMove);
+        args.putBoolean(ARG_PARAM4, isSelectMultiple);
         fragment.setArguments(args);
         return fragment;
     }
@@ -81,7 +83,7 @@ public class Fragment_Album_Choose extends Fragment {
             imageId = getArguments().getLong(ARG_PARAM1);
             albumId = getArguments().getLong(ARG_PARAM2);
             isDetailRemoveActivity = getArguments().getBoolean(ARG_PARAM3);
-            isMove = getArguments().getBoolean(ARG_PARAM4);
+            isSelectMultiple = getArguments().getBoolean(ARG_PARAM4);
         }
         setHasOptionsMenu(true);
         try {
@@ -89,6 +91,9 @@ public class Fragment_Album_Choose extends Fragment {
                 mainDetailRemove = (DetailRemovePhotoActivity)getActivity();
                 albumDbHelper = DatabaseSingleton.getInstance(mainDetailRemove).getDbHelper();
 
+            } else if(isSelectMultiple){
+                mainDetailSelect = (SelectActivity) getActivity();
+                albumDbHelper = DatabaseSingleton.getInstance(mainDetailSelect).getDbHelper();
             } else {
                 mainDetail = (DetailPhotoActivity) getActivity();
                 albumDbHelper = DatabaseSingleton.getInstance(mainDetail).getDbHelper();
@@ -107,6 +112,8 @@ public class Fragment_Album_Choose extends Fragment {
         recyclerView = (RecyclerView) rootView.findViewById(R.id.layout_grid_album);
         if(isDetailRemoveActivity){
             adapter = new GridAlbumAdapter(mainDetailRemove, albumList);
+        } else if (isSelectMultiple){
+          adapter = new GridAlbumAdapter(mainDetailSelect, albumList);
         } else {
             adapter = new GridAlbumAdapter(mainDetail, albumList);
         }
@@ -119,20 +126,32 @@ public class Fragment_Album_Choose extends Fragment {
             public void onItemClick(Album album) {
                 // Xử lý khi một item được click
 
-                if(isMove){
+                if(isSelectMultiple){
+                    for(int i=0; i<SelectActivity.checkedArr.size(); i++){
+                        SelectActivity.result.moveToPosition(SelectActivity.checkedArr.get(i));
+                        imageId = SelectActivity.result.getLong(0);
+                        albumId = albumDbHelper.getAlbumIdByImageId(imageId);
+                        albumDbHelper.moveImageToAlbum(imageId, albumId, album.getAlbumID());
+
+                        long firstImageIDAlbumCurrent = albumDbHelper.findFirstImageIDAlbum(albumId);
+                        albumDbHelper.updateAlbumFirstImage(albumId, firstImageIDAlbumCurrent);
+                    }
+                    long firstImageIDAlbumNew = albumDbHelper.findFirstImageIDAlbum(album.getAlbumID());
+                    albumDbHelper.updateAlbumFirstImage(album.getAlbumID(), firstImageIDAlbumNew);
+
+                } else {
                     albumDbHelper.moveImageToAlbum(imageId, albumId, album.getAlbumID());
                     long firstImageIDAlbumCurrent = albumDbHelper.findFirstImageIDAlbum(albumId);
                     long firstImageIDAlbumNew = albumDbHelper.findFirstImageIDAlbum(album.getAlbumID());
-                    albumDbHelper.updateAlbumFirstImage(albumId,firstImageIDAlbumCurrent);
-                    albumDbHelper.updateAlbumFirstImage(album.getAlbumID(), firstImageIDAlbumNew);
-                } else {
-                    albumDbHelper.copyImageToAlbum(imageId, album.getAlbumID());
-                    long firstImageIDAlbumNew = albumDbHelper.findFirstImageIDAlbum(album.getAlbumID());
+                    albumDbHelper.updateAlbumFirstImage(albumId, firstImageIDAlbumCurrent);
                     albumDbHelper.updateAlbumFirstImage(album.getAlbumID(), firstImageIDAlbumNew);
                 }
 
                 if(isDetailRemoveActivity){
                     Toast.makeText(mainDetailRemove, "Restore Successfull", Toast.LENGTH_SHORT).show();
+                    requireActivity().getSupportFragmentManager().popBackStack();
+                } else if (isSelectMultiple){
+                    Toast.makeText(mainDetailSelect, "Successfull", Toast.LENGTH_SHORT).show();
                     requireActivity().getSupportFragmentManager().popBackStack();
                 } else {
                     Toast.makeText(mainDetail, "Successfull", Toast.LENGTH_SHORT).show();

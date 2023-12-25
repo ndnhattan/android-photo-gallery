@@ -3,6 +3,10 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
 
+    <item android:title="Favorite"
+        android:id="@+id/add_to_favor"
+        android:icon="@drawable/icon_favorite"
+        app:showAsAction="always"></item>
     <item android:title="Move to Album"
         android:id="@+id/move_to_album"></item>
 

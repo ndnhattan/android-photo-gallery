@@ -20,7 +20,8 @@
         app:layout_constraintTop_toTopOf="parent"
         app:title="1 Selected"
         app:titleMarginStart="10dp"
-        app:titleTextColor="#FFFFFF">
+        app:titleTextColor="#FFFFFF"
+        app:menu="@menu/menu_toolbar_select_photo">
         <CheckBox
             android:id="@+id/toolbar_checkbox"
             android:layout_width="wrap_content"
@@ -53,13 +54,13 @@
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
         android:layout_margin="0dp"
-        android:background="@drawable/round_corner"
+        android:background="@color/white"
         android:elevation="2dp"
         app:itemIconSize="27dp"
-        app:itemIconTint="@color/color_navigation"
+        app:itemIconTint="@drawable/custom_bottom_nav"
         app:itemRippleColor="@android:color/transparent"
-        app:itemTextColor="@color/color_navigation"
-        app:labelVisibilityMode="selected"
+        app:itemTextColor="@drawable/custom_bottom_nav"
+        app:labelVisibilityMode="labeled"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/recyclerView"

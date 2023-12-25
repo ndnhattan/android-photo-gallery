@@ -366,7 +366,7 @@ public class EditActivity extends BaseActivity implements OnPhotoEditorListener,
     /////////////////////////////////////////
 
     private void initViews() {
-        ImageView imgUndo, imgRedo, imgCamera, imgGallery, imgSave, imgClose;
+        ImageView imgUndo, imgRedo, imgGallery, imgSave, imgClose;
         mPhotoEditorView = findViewById(R.id.photoEditorView);
         mTxtCurrentTool = findViewById(R.id.txtCurrentTool);
         mRvTools = findViewById(R.id.rvConstraintTools);
@@ -377,8 +377,6 @@ public class EditActivity extends BaseActivity implements OnPhotoEditorListener,
         imgUndo.setOnClickListener(this);
         imgRedo = findViewById(R.id.imgRedo);
         imgRedo.setOnClickListener(this);
-        imgCamera = findViewById(R.id.imgCamera);
-        imgCamera.setOnClickListener(this);
         imgGallery = findViewById(R.id.imgGallery);
         imgGallery.setOnClickListener(this);
         imgSave = findViewById(R.id.imgSave);
@@ -431,9 +429,6 @@ public class EditActivity extends BaseActivity implements OnPhotoEditorListener,
             saveImage();
         } else if (key == R.id.imgClose) {
             onBackPressed();
-        } else if (key == R.id.imgCamera) {
-            Intent cameraIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-            startActivityForResult(cameraIntent, CAMERA_REQUEST);
         } else if (key == R.id.imgGallery) {
             Intent intent = new Intent();
             intent.setType("image/*");
@@ -574,11 +569,6 @@ public class EditActivity extends BaseActivity implements OnPhotoEditorListener,
         super.onActivityResult(requestCode, resultCode, data);
         if (resultCode == RESULT_OK) {
             switch (requestCode) {
-                case CAMERA_REQUEST:
-                    mPhotoEditor.clearAllViews();
-                    Bitmap photo = (Bitmap) data.getExtras().get("data");
-                    mPhotoEditorView.getSource().setImageBitmap(photo);
-                    break;
                 case PICK_REQUEST:
                     try {
                         mPhotoEditor.clearAllViews();
@@ -752,7 +742,6 @@ public class EditActivity extends BaseActivity implements OnPhotoEditorListener,
 
 
     private static final String TAG = EditActivity.class.getSimpleName();
-    private static final int CAMERA_REQUEST = 52;
     private static final int PICK_REQUEST = 53;
 
 

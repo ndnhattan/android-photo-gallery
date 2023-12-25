@@ -164,6 +164,10 @@ public class Fragment_Album extends Fragment {
             currentAlbum = new Album(cursor.getLong(0), cursor.getString(1),imageData);
             albumList.add(currentAlbum);
         }
+        if(albumList.get(2) != null){
+            albumList.remove(2);
+        }
+
     }
 
     Toolbar mToolbar;

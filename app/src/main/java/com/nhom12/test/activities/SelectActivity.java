@@ -1,25 +1,47 @@
 package com.nhom12.test.activities;
 
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+
+import android.app.Dialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
+import android.graphics.Bitmap;
+import android.graphics.Color;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.ColorDrawable;
+import android.graphics.drawable.Drawable;
+import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.util.Log;
+import android.view.Gravity;
+import android.view.MenuItem;
 import android.view.View;
+import android.view.Window;
+import android.view.WindowManager;
+import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.Toast;
 
+import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.nhom12.test.Fragment_Album_Choose;
+import com.nhom12.test.Fragment_Photo;
 import com.nhom12.test.R;
 import com.nhom12.test.adapter.ListImageAdapter;
 import com.nhom12.test.adapter.ListImageSelectAdapter;
 import com.nhom12.test.database.AlbumDbHelper;
 import com.nhom12.test.database.DatabaseSingleton;
 
+import java.io.File;
 import java.sql.Date;
 import java.sql.Timestamp;
 import java.util.ArrayList;
@@ -36,15 +58,13 @@ public class SelectActivity extends AppCompatActivity {
     public static ArrayList<Integer> checkedArr = new ArrayList<>();
     ListImageSelectAdapter listImageAdapter;
     CheckBox checkBox;
-<<<<<<< Updated upstream
-=======
+
     BottomNavigationView navigation;
 
     //handle remove checked
     long imageIdRemove;
     long albumIdRemove;
     long imageId, albumId;
->>>>>>> Stashed changes
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -77,9 +97,32 @@ public class SelectActivity extends AppCompatActivity {
         mToolbar.setNavigationOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                onBackPressed();
+                if(getSupportFragmentManager().findFragmentByTag("ft_album_move_multiple") != null){
+                    Toast.makeText(SelectActivity.this, "OK", Toast.LENGTH_SHORT).show();
+                    getSupportFragmentManager().popBackStack("ft_album_move_multiple", FragmentManager.POP_BACK_STACK_INCLUSIVE);
+                }
+                else
+                    onBackPressed();
             }
         });
+
+
+
+        //handle mToolbar
+        mToolbar.setOnMenuItemClickListener(new Toolbar.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(MenuItem item) {
+                int key = item.getItemId();
+                if (key == R.id.move_to_album) {
+                    Fragment fragment = Fragment_Album_Choose.newInstance(0, 0, false, true);
+                    FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+                    ft.replace(R.id.body_container, fragment, "ft_album_move_multiple").addToBackStack("ft_album_move_multiple");
+                    ft.commit();
+                }
+                return true;
+            }
+        });
+
         checkBox = (CheckBox) findViewById(R.id.toolbar_checkbox);
         checkBox.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -96,8 +139,6 @@ public class SelectActivity extends AppCompatActivity {
                 }
             }
         });
-<<<<<<< Updated upstream
-=======
 
         // handle navigation
         navigation = (BottomNavigationView) findViewById(R.id.bottom_navigation);
@@ -156,7 +197,6 @@ public class SelectActivity extends AppCompatActivity {
             return true;
         });
 
->>>>>>> Stashed changes
     }
 
     private void loadImages() {
@@ -249,5 +289,55 @@ public class SelectActivity extends AppCompatActivity {
         calendar.set(Calendar.SECOND, 0);
         calendar.set(Calendar.MILLISECOND, 0);
         return calendar.getTimeInMillis() / 1000; // Convert to seconds
+    }
+
+    public void displayDialogAndRemove() {
+        final Dialog dialog = new Dialog(SelectActivity.this);
+        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+        dialog.setContentView(R.layout.layout_check);
+        Window window = dialog.getWindow();
+        if (window == null) {
+            return;
+        }
+        window.setLayout(WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.WRAP_CONTENT);
+
+        WindowManager.LayoutParams windowAttributes = window.getAttributes();
+        windowAttributes.gravity = Gravity.CENTER;
+        window.setAttributes(windowAttributes);
+        window.setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+
+
+        dialog.setCancelable(true);
+        Button btnSubmit = dialog.findViewById(R.id.btnSubmit_check);
+        Button btnExit = dialog.findViewById(R.id.btnExit_check);
+
+        btnSubmit.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                for(int i=0; i<checkedArr.size(); i++) {
+                    result.moveToPosition(checkedArr.get(i));
+                    imageIdRemove = result.getLong(0);
+                    albumIdRemove = albumDbHelper.getAlbumIdByImageId(imageIdRemove);
+                    albumDbHelper.moveImageToAlbum(imageIdRemove, albumIdRemove,2); // 2 la id mac dinh cua album remove
+                    long firstImageIDAlbumCurrent = albumDbHelper.findFirstImageIDAlbum(albumIdRemove);
+                    albumDbHelper.updateAlbumFirstImage(albumIdRemove,firstImageIDAlbumCurrent);
+                }
+                dialog.dismiss();
+
+                Intent intent = new Intent();
+                intent.putExtra("isUpdate", true);
+                setResult(RESULT_OK, intent);
+                finish();
+
+            }
+        });
+
+        btnExit.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                dialog.dismiss();
+            }
+        });
+        dialog.show();
     }
 }

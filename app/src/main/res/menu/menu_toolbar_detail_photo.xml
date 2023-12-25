@@ -12,7 +12,5 @@
         app:showAsAction="always"></item>
     <item android:title="Move to Album"
         android:id="@+id/move_to_album"></item>
-    <item android:title="Copy to Album"
-        android:id="@+id/copy_to_album"></item>
 
 </menu>

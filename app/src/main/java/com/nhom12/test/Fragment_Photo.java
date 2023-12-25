@@ -3,6 +3,7 @@ package com.nhom12.test;
 
 import android.content.Intent;
 import android.database.Cursor;
+import android.graphics.Bitmap;
 import android.media.MediaScannerConnection;
 import android.net.Uri;
 import android.os.Bundle;
@@ -21,9 +22,11 @@ import android.widget.Toast;
 import androidx.annotation.Nullable;
 import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentTransaction;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.nhom12.test.activities.FileSaveHelper;
 import com.nhom12.test.adapter.ListImageAdapter;
 import com.nhom12.test.database.AlbumDbHelper;
 import com.nhom12.test.database.DatabaseSingleton;
@@ -46,6 +49,7 @@ public class Fragment_Photo extends Fragment {
     public static ArrayList<Integer> indexArr = new ArrayList<>();
     public static int index;
     ListImageAdapter listImageAdapter;
+    static final int REQUEST_IMAGE_CAPTURE = 1;
 
     public static Fragment_Photo newInstance(String strArg) {
         Fragment_Photo fragment = new Fragment_Photo();
@@ -78,12 +82,28 @@ public class Fragment_Photo extends Fragment {
                 listImageAdapter.setData(rs);
             }
         }
+        if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == main.RESULT_OK) {
+            Bundle extras = data.getExtras();
+            Bitmap imageBitmap = (Bitmap) extras.get("data");
+            String imagePath = FileSaveHelper.saveBitmap(getActivity().getApplicationContext(), imageBitmap);
+            if (imagePath != null) {
+                Log.e("test", imagePath);
+            } else {
+                // Failed to save the image
+            }
+
+            MediaScannerConnection.scanFile(getContext(), new String[]{imagePath}, null, null);
+            Intent i = new Intent(getActivity(), MainActivity.class);
+            i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+            startActivity(i);
+        }
     }
 
     private void loadImages() {
         result = albumDbHelper.readAllImages();
         int position = 0;
         int preyear = 0, premonth = 0, preday = 0;
+        indexArr.clear();
         if (result != null) {
             result.moveToPosition(-1);
             while (result.moveToNext()) {
@@ -114,7 +134,7 @@ public class Fragment_Photo extends Fragment {
                 Cursor monthImage = albumDbHelper.readImageByDate(startOfMonth, endOfMonth);
 
                 rs.add(monthImage);
-                indexArr.add(position);
+                indexArr.add(position + rs.size() -1 );
                 position += monthImage.getCount() - 1;
                 result.moveToPosition(position);
             }
@@ -126,12 +146,13 @@ public class Fragment_Photo extends Fragment {
         String[] projection = {
                 MediaStore.Images.Media.BUCKET_DISPLAY_NAME,
                 MediaStore.Images.Media._ID,
-                MediaStore.Images.Media.DATA, // Path to the image file
+                MediaStore.Images.Media.DATA,
                 MediaStore.Images.Media.DATE_ADDED
         };
-        String sortOrder = MediaStore.Images.Media.BUCKET_DISPLAY_NAME + " ASC, " + MediaStore.Images.Media.DATE_ADDED + " DESC"; // Sort by date added in descending order
+        String sortOrder = MediaStore.Images.Media.BUCKET_DISPLAY_NAME + " ASC, " + MediaStore.Images.Media.DATE_ADDED + " DESC";
 
-        Cursor result = main.getContentResolver().query(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, projection, null, null, sortOrder);
+        Cursor result = main.getContentResolver().query(MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
+                                                        projection, null, null, sortOrder);
         String currentAlbumName = null;
         result.moveToPosition(-1);
         // Add album favorite
@@ -190,7 +211,7 @@ public class Fragment_Photo extends Fragment {
             int id = item.getItemId();
 
             if (id == R.id.camera) {
-                Toast.makeText(getActivity(), "Camera", Toast.LENGTH_LONG).show();
+                dispatchTakePictureIntent();
                 return true;
             } else if (id == R.id.search) {
                 Toast.makeText(getActivity(), "Search", Toast.LENGTH_LONG).show();
@@ -209,5 +230,11 @@ public class Fragment_Photo extends Fragment {
         return rootView;
     }
 
+    private void dispatchTakePictureIntent() {
+        Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+
+        if (takePictureIntent.resolveActivity(getActivity().getPackageManager()) != null) {
+            startActivityForResult(takePictureIntent, REQUEST_IMAGE_CAPTURE);
+        }
+    }
 }
-    
