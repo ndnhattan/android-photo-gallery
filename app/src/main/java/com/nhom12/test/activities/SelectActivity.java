@@ -58,11 +58,13 @@ public class SelectActivity extends AppCompatActivity {
     public static ArrayList<Integer> checkedArr = new ArrayList<>();
     ListImageSelectAdapter listImageAdapter;
     CheckBox checkBox;
+
     BottomNavigationView navigation;
 
     //handle remove checked
     long imageIdRemove;
     long albumIdRemove;
+    long imageId, albumId;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -146,7 +148,52 @@ public class SelectActivity extends AppCompatActivity {
             if (key == R.id.menu_detail_delete) {
                 displayDialogAndRemove();
             }
+            else if(key == R.id.menu_detail_hide){
+                AlertDialog.Builder builder = new AlertDialog.Builder(SelectActivity.this);
+                builder.setTitle("Confirm");
+                builder.setMessage("Do you want to hide these images?");
+                builder.setPositiveButton("HIDE", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                        for(int i=0; i<checkedArr.size(); i++) {
+                            result.moveToPosition(checkedArr.get(i));
+                            imageId = result.getLong(0);
+                            albumId = albumDbHelper.getAlbumIdByImageId(imageId);
+                            albumDbHelper.moveImageToAlbum(imageId, albumId,3);
+                        }
+                        Intent intent = new Intent();
+                        intent.putExtra("isUpdate", true);
+                        setResult(RESULT_OK, intent);
+                        finish();
+                        dialog.dismiss();
+                    }
+                });
+                builder.setNegativeButton("CANCEL", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                    }
+                });
+                AlertDialog alert = builder.create();
+                alert.show();
+            }
+            else if(key == R.id.menu_detail_share){
+                ArrayList<Uri> uris = new ArrayList<>();
+                Intent intentShareMultiple = new Intent();
+                intentShareMultiple.setAction(Intent.ACTION_SEND_MULTIPLE);
+                intentShareMultiple.setType("image/*");
+                for(int i=0; i<checkedArr.size(); i++) {
+                    result.moveToPosition(checkedArr.get(i));
+                    String imagePath = result.getString(1);
+                    Drawable mDrawable = Drawable.createFromPath(imagePath);
+                    Bitmap mBitmap = ((BitmapDrawable) mDrawable).getBitmap();
+                    String path = MediaStore.Images.Media.insertImage(getContentResolver(), mBitmap, "Image Description", null);
 
+                    Uri uri = Uri.parse(path);
+                    uris.add(uri);
+                }
+                intentShareMultiple.putParcelableArrayListExtra(Intent.EXTRA_STREAM, uris);
+                startActivity(Intent.createChooser(intentShareMultiple , "Share images"));
+            }
             return true;
         });
 

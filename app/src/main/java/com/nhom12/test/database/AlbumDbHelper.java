@@ -422,18 +422,6 @@ public class AlbumDbHelper extends SQLiteOpenHelper {
         db.delete(TABLE_ALBUM_IMAGE, deleteSelection, deleteSelectionArgs);
     }
 
-    public Cursor readImageByAlbumIDAndByDate(long albumID, String date) {
-        SQLiteDatabase db = getReadableDatabase();
 
-        String sql = "SELECT image.* " +
-                "FROM image " +
-                "INNER JOIN album_image ON image.image_id = album_image.ai_image_id " +
-                "WHERE album_image.ai_album_id = ? AND " +
-                "strftime('%Y-%m-%d', image.image_date) = ?";
-
-        Cursor cursor = db.rawQuery(sql, new String[]{String.valueOf(albumID), date});
-
-        return cursor;
-    }
 
 }
