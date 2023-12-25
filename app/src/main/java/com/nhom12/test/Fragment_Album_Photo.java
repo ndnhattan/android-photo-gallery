@@ -130,16 +130,6 @@ public class Fragment_Album_Photo extends Fragment {
             int id = item.getItemId();
 
             if (id == R.id.camera) {
-                Toast.makeText(getActivity(), "Camera", Toast.LENGTH_LONG).show();
-                return true;
-            } else if (id == R.id.search) {
-                Toast.makeText(getActivity(), "Search", Toast.LENGTH_LONG).show();
-                return true;
-            } else if(id == R.id.color){
-                Toast.makeText(getActivity(), "Color", Toast.LENGTH_LONG).show();
-                return true;
-            } else if(id == R.id.setting){
-                Toast.makeText(getActivity(), "Settings", Toast.LENGTH_LONG).show();
                 return true;
             } else
                 return false;

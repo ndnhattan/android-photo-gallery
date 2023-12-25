@@ -1,5 +1,6 @@
 package com.nhom12.test.adapter;
 
+import android.app.Activity;
 import android.content.Context;
 import android.database.Cursor;
 import android.view.LayoutInflater;
@@ -19,9 +20,9 @@ import java.util.ArrayList;
 
 public class ListImageSelectAdapter extends RecyclerView.Adapter<ListImageSelectAdapter.ViewHolder> {
     private ArrayList<Cursor> rs;
-    private Context context;
+    private Activity context;
 
-    public ListImageSelectAdapter(Context context, ArrayList<Cursor> rs) {
+    public ListImageSelectAdapter(Activity context, ArrayList<Cursor> rs) {
         this.context = context;
         this.rs = rs;
     }

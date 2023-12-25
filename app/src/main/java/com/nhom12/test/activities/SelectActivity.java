@@ -66,6 +66,7 @@ public class SelectActivity extends AppCompatActivity {
     long albumIdRemove;
     long imageId, albumId;
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -133,9 +134,11 @@ public class SelectActivity extends AppCompatActivity {
                         checkedArr.add(i);
                     }
                     listImageAdapter.notifyDataSetChanged();
+                    mToolbar.setTitle(SelectActivity.checkedArr.size() + " Selected");
                 }else {
                     checkedArr.clear();
                     listImageAdapter.notifyDataSetChanged();
+                    mToolbar.setTitle(SelectActivity.checkedArr.size() + " Selected");
                 }
             }
         });

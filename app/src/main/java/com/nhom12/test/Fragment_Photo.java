@@ -213,16 +213,7 @@ public class Fragment_Photo extends Fragment {
             if (id == R.id.camera) {
                 dispatchTakePictureIntent();
                 return true;
-            } else if (id == R.id.search) {
-                Toast.makeText(getActivity(), "Search", Toast.LENGTH_LONG).show();
-                return true;
-            } else if (id == R.id.color) {
-                Toast.makeText(getActivity(), "Color", Toast.LENGTH_LONG).show();
-                return true;
-            } else if (id == R.id.setting) {
-                Toast.makeText(getActivity(), "Settings", Toast.LENGTH_LONG).show();
-                return true;
-            } else
+            }  else
                 return false;
 
         });

@@ -1,6 +1,7 @@
 package com.nhom12.test.adapter;
 
 import android.annotation.SuppressLint;
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
@@ -11,6 +12,7 @@ import android.view.ViewGroup;
 import android.widget.AbsListView;
 import android.widget.CheckBox;
 import android.widget.ImageView;
+import androidx.appcompat.widget.Toolbar;
 
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.RecyclerView;
@@ -29,13 +31,13 @@ import java.util.ArrayList;
 
 public class GridImageSelectAdapter extends RecyclerView.Adapter<GridImageSelectAdapter.ViewHolder> {
     private Cursor rs;
-    private Context context;
+    private Activity context;
     private int index;
     private ArrayList<String> album;
     private static int REQUEST_CODE_PIC = 10;
     AlbumDbHelper albumDbHelper; // db
 
-    public GridImageSelectAdapter(Context context, Cursor rs, int index) {
+    public GridImageSelectAdapter(Activity context, Cursor rs, int index) {
         this.context = context;
         this.rs = rs;
         this.index = index;
@@ -86,8 +88,12 @@ public class GridImageSelectAdapter extends RecyclerView.Adapter<GridImageSelect
             public void onClick(View v) {
                 if (SelectActivity.checkedArr.contains(SelectActivity.indexArr.get(index) + position)) {
                     SelectActivity.checkedArr.remove(Integer.valueOf(SelectActivity.indexArr.get(index) + position));
+                    Toolbar toolbar = context.findViewById(R.id.toolbar_photo);
+                    toolbar.setTitle(SelectActivity.checkedArr.size() + " Selected");
                 } else {
                     SelectActivity.checkedArr.add(SelectActivity.indexArr.get(index) + position);
+                    Toolbar toolbar = context.findViewById(R.id.toolbar_photo);
+                    toolbar.setTitle(SelectActivity.checkedArr.size() + " Selected");
                 }
             }
         });
@@ -97,9 +103,13 @@ public class GridImageSelectAdapter extends RecyclerView.Adapter<GridImageSelect
                 if (SelectActivity.checkedArr.contains(SelectActivity.indexArr.get(index) + position)) {
                     SelectActivity.checkedArr.remove(Integer.valueOf(SelectActivity.indexArr.get(index) + position));
                     holder.checkBox.setChecked(false);
+                    Toolbar toolbar = context.findViewById(R.id.toolbar_photo);
+                    toolbar.setTitle(SelectActivity.checkedArr.size() + " Selected");
                 } else {
                     SelectActivity.checkedArr.add(SelectActivity.indexArr.get(index) + position);
                     holder.checkBox.setChecked(true);
+                    Toolbar toolbar = context.findViewById(R.id.toolbar_photo);
+                    toolbar.setTitle(SelectActivity.checkedArr.size() + " Selected");
                 }
             }
         });
