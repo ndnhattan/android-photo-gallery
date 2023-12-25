@@ -24,6 +24,7 @@ import android.widget.DatePicker;
 import android.widget.Toast;
 
 import com.nhom12.test.adapter.ListAlbumImageAdapter;
+import com.nhom12.test.adapter.ListFavorImageAdapter;
 import com.nhom12.test.adapter.ListImageAdapter;
 import com.nhom12.test.database.AlbumDbHelper;
 import com.nhom12.test.database.DatabaseSingleton;
@@ -38,6 +39,7 @@ import java.util.Set;
 
 
 public class Fragment_Favorite extends Fragment {
+<<<<<<< Updated upstream
 
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -64,6 +66,8 @@ public class Fragment_Favorite extends Fragment {
 
     Button favor;
 
+=======
+>>>>>>> Stashed changes
     private static final String ARG_PARAM1 = "par1";
     private long albumID = 1;
     ArrayList<Cursor> rs = new ArrayList<>();
@@ -71,7 +75,10 @@ public class Fragment_Favorite extends Fragment {
     RecyclerView recyclerView;
     AlbumDbHelper albumDbHelper;
     Toolbar mToolbar;
-    ListAlbumImageAdapter listAlbumImageAdapter;
+    ListFavorImageAdapter listFavorImageAdapter;
+    public static ArrayList<Integer> indexArr = new ArrayList<>();
+
+    public static Cursor result;
     
 
     public static Fragment_Favorite newInstance(long albumID) {
@@ -106,7 +113,7 @@ public class Fragment_Favorite extends Fragment {
             if(isUpdate){
                 rs.clear();
                 listImages(albumID);
-                listAlbumImageAdapter.setData(rs);
+                listFavorImageAdapter.setData(rs);
             }
         }
     }
@@ -117,8 +124,8 @@ public class Fragment_Favorite extends Fragment {
         recyclerView = (RecyclerView) rootView.findViewById(R.id.recyclerViewFavor);
         rs.clear();
         listImages(1);
-        listAlbumImageAdapter = new ListAlbumImageAdapter(main, rs, this);
-        recyclerView.setAdapter(listAlbumImageAdapter);
+        listFavorImageAdapter = new ListFavorImageAdapter(main, rs, this);
+        recyclerView.setAdapter(listFavorImageAdapter);
 
 
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(main);
@@ -134,7 +141,6 @@ public class Fragment_Favorite extends Fragment {
                 Toast.makeText(getActivity(), "Choose", Toast.LENGTH_LONG).show();
                 return true;
             } else if (id == R.id.search) {
-                showDatePickerDialog(item);
                 return true;
             } else
                 return false;
@@ -146,9 +152,10 @@ public class Fragment_Favorite extends Fragment {
         return rootView;
     }
     private void listImages(long albumID) {
-        Cursor result = albumDbHelper.readImageByAlbumID(albumID);
+        result = albumDbHelper.readImageByAlbumID(albumID);
         int position = 0;
         int preyear = 0, premonth = 0, preday = 0;
+        indexArr.clear();
         while (result.moveToNext()) {
             String imageDate = result.getString(2);
             Timestamp tms = new Timestamp(Long.parseLong(imageDate) * 1000);
@@ -177,6 +184,7 @@ public class Fragment_Favorite extends Fragment {
             Cursor monthImage = albumDbHelper.readImageByAlbumIDAndByDate(albumID, startOfMonth, endOfMonth);
 
             rs.add(monthImage);
+            indexArr.add(position + rs.size() -1 );
             position += monthImage.getCount() - 1;
             result.moveToPosition(position);
         }
@@ -193,47 +201,7 @@ public class Fragment_Favorite extends Fragment {
         calendar.set(Calendar.MILLISECOND, 0);
         return calendar.getTimeInMillis() / 1000; // Convert to seconds
     }
-    private void showDatePickerDialog(@NonNull MenuItem item) {
-        final Calendar calendar = Calendar.getInstance();
-        int day = calendar.get(Calendar.DATE);
-        int month = calendar.get(Calendar.MONTH);
-        int year = calendar.get(Calendar.YEAR);
-        DatePickerDialog datePickerDialog = new DatePickerDialog(getContext(), new DatePickerDialog.OnDateSetListener() {
-            @Override
-            public void onDateSet(DatePicker datePicker, int i, int i1, int i2) {
-                calendar.set(i, i1, i2);
-                SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd-MM-yyyy");
-                String date = simpleDateFormat.format(calendar.getTime());
-                showImageByDate(date);
-            }
-        }, year, month, day);
-        datePickerDialog.show();
-    }
 
-    private void showImageByDate(String date) {
-        rs.clear();
-
-        // Chuyển đổi chuỗi ngày thành các thành phần riêng lẻ (năm, tháng, ngày)
-        String[] dateComponents = date.split("-");
-        if (dateComponents.length == 3) {
-            int day = Integer.parseInt(dateComponents[0]);
-            int month = Integer.parseInt(dateComponents[1]);
-            int year = Integer.parseInt(dateComponents[2]);
-
-            //Cursor imageCursor = albumDbHelper.readImageByAlbumIDAndByDate(1, date);
-            //rs.add(imageCursor);
-            Toast.makeText(getContext(), "Images for date: " + day + month + year, Toast.LENGTH_LONG).show();
-            listAlbumImageAdapter = new ListAlbumImageAdapter(main, rs, getParentFragment());
-            recyclerView.setAdapter(listAlbumImageAdapter);
-
-            // Cấu hình LayoutManager
-            LinearLayoutManager linearLayoutManager = new LinearLayoutManager(main);
-            recyclerView.setLayoutManager(linearLayoutManager);
-        } else {
-            // Xử lý trường hợp không thành công khi chuyển đổi ngày
-            Toast.makeText(getContext(), "Invalid date format", Toast.LENGTH_SHORT).show();
-        }
-    }
 
 
 }

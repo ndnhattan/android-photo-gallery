@@ -184,6 +184,9 @@ public class DetailPhotoActivity extends AppCompatActivity{
                         albumDbHelper.removeImageFromAlbumFavor(imageId);
                         item.setIcon(R.drawable.icon_favorite);
                     }
+                    Intent intent = new Intent();
+                    intent.putExtra("isUpdate", true);
+                    setResult(RESULT_OK, intent);
                 }
                 else if(key == R.id.btn_info){
 

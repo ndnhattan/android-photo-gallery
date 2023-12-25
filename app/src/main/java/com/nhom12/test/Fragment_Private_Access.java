@@ -19,6 +19,7 @@ import android.widget.Toast;
 
 import com.nhom12.test.adapter.ListAlbumImageAdapter;
 import com.nhom12.test.adapter.ListImageAdapter;
+import com.nhom12.test.adapter.ListPrivateImageAdapter;
 import com.nhom12.test.database.AlbumDbHelper;
 import com.nhom12.test.database.DatabaseSingleton;
 
@@ -39,7 +40,11 @@ public class Fragment_Private_Access extends Fragment {
     RecyclerView recyclerView;
     AlbumDbHelper albumDbHelper;
     Toolbar mToolbar;
-    ListAlbumImageAdapter listAlbumImageAdapter;
+    ListPrivateImageAdapter listPrivateImageAdapter;
+
+    public static ArrayList<Integer> indexArr = new ArrayList<>();
+
+    public static Cursor result;
     public Fragment_Private_Access() {
 
     }
@@ -74,7 +79,7 @@ public class Fragment_Private_Access extends Fragment {
             if(isUpdate){
                 rs.clear();
                 listImages(albumID);
-                listAlbumImageAdapter.setData(rs);
+                listPrivateImageAdapter.setData(rs);
             }
         }
     }
@@ -85,8 +90,8 @@ public class Fragment_Private_Access extends Fragment {
         recyclerView = (RecyclerView) rootView.findViewById(R.id.recyclerViewPrivate);
         rs.clear();
         listImages(3);
-        listAlbumImageAdapter = new ListAlbumImageAdapter(main, rs, this);
-        recyclerView.setAdapter(listAlbumImageAdapter);
+        listPrivateImageAdapter = new ListPrivateImageAdapter(main, rs, this);
+        recyclerView.setAdapter(listPrivateImageAdapter);
 
 
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(main);
@@ -118,9 +123,10 @@ public class Fragment_Private_Access extends Fragment {
         return rootView;
     }
     private void listImages(long albumID) {
-        Cursor result = albumDbHelper.readImageByAlbumID(albumID);
+        result = albumDbHelper.readImageByAlbumID(albumID);
         int position = 0;
         int preyear = 0, premonth = 0, preday = 0;
+        indexArr.clear();
         while (result.moveToNext()) {
             String imageDate = result.getString(2);
             Timestamp tms = new Timestamp(Long.parseLong(imageDate) * 1000);
@@ -149,6 +155,7 @@ public class Fragment_Private_Access extends Fragment {
             Cursor monthImage = albumDbHelper.readImageByAlbumIDAndByDate(albumID, startOfMonth, endOfMonth);
 
             rs.add(monthImage);
+            indexArr.add(position + rs.size() -1 );
             position += monthImage.getCount() - 1;
             result.moveToPosition(position);
         }
